@@ -16,8 +16,8 @@ const testCategories = [
     category: '성격 검사',
     tests: [
       { code: 'mbti', name: 'MBTI', description: '16가지 성격 유형 분석', questions: 48, available: true },
-      { code: 'disc', name: 'DISC', description: '행동 유형 분석', questions: 28, available: false },
-      { code: 'enneagram', name: '에니어그램', description: '9가지 성격 유형', questions: 36, available: false },
+      { code: 'disc', name: 'DISC', description: '행동 유형 분석', questions: 28, available: true },
+      { code: 'enneagram', name: '에니어그램', description: '9가지 성격 유형', questions: 36, available: true },
       { code: 'tci', name: 'TCI', description: '기질 및 성격 검사', questions: 140, available: false },
     ],
   },
@@ -25,7 +25,7 @@ const testCategories = [
     category: '적성/역량 검사',
     tests: [
       { code: 'gallup', name: 'Gallup 강점', description: '34개 강점 테마', questions: 34, available: false },
-      { code: 'holland', name: 'Holland', description: '직업 흥미 유형', questions: 42, available: false },
+      { code: 'holland', name: 'Holland', description: '직업 흥미 유형', questions: 42, available: true },
       { code: 'iq', name: 'IQ 테스트', description: '논리/패턴 분석', questions: 30, available: false },
       { code: 'mmpi', name: 'MMPI 간이', description: '다면적 인성 검사', questions: 50, available: false },
     ],
@@ -35,10 +35,10 @@ const testCategories = [
     tests: [
       { code: 'tarot', name: '타로', description: '이미지 선택 기반', questions: 10, available: false },
       { code: 'htp', name: 'HTP', description: '그림 심리 검사', questions: 3, available: false },
-      { code: 'saju', name: '사주', description: '생년월일시 분석', questions: 1, available: false },
-      { code: 'sasang', name: '사상체질', description: '체질 유형 분석', questions: 20, available: false },
+      { code: 'saju', name: '사주', description: '생년월일시 사주팔자', questions: 5, available: true },
+      { code: 'sasang', name: '사상체질', description: '체질 유형 분석', questions: 20, available: true },
       { code: 'face', name: '관상', description: '얼굴 분석', questions: 1, available: false },
-      { code: 'blood', name: '혈액형', description: '혈액형 성격 분석', questions: 5, available: false },
+      { code: 'blood', name: '혈액형', description: '혈액형 성격 분석', questions: 5, available: true },
     ],
   },
 ];
