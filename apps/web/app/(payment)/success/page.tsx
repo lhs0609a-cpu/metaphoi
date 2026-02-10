@@ -6,14 +6,17 @@ import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { getTestMeta } from '@/data/tests';
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
+  const testCode = searchParams.get('testCode');
   const [loading, setLoading] = useState(true);
 
+  const testMeta = testCode ? getTestMeta(testCode) : null;
+
   useEffect(() => {
-    // In production, verify payment with backend
     const timer = setTimeout(() => {
       setLoading(false);
     }, 1500);
@@ -53,7 +56,9 @@ function PaymentSuccessContent() {
           </div>
           <CardTitle className="text-2xl">결제 완료</CardTitle>
           <CardDescription>
-            리포트 구매가 완료되었습니다
+            {testMeta
+              ? `${testMeta.name} 전체 분석이 잠금 해제되었습니다`
+              : '리포트 구매가 완료되었습니다'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -67,8 +72,17 @@ function PaymentSuccessContent() {
           </p>
 
           <div className="flex flex-col gap-2">
+            {testCode && (
+              <Link href={`/results/${testCode}/preview`}>
+                <Button className="w-full">
+                  {testMeta?.name || testCode.toUpperCase()} 전체 결과 보기
+                </Button>
+              </Link>
+            )}
             <Link href="/results/reports">
-              <Button className="w-full">리포트 보기</Button>
+              <Button variant={testCode ? 'outline' : 'default'} className="w-full">
+                리포트 보기
+              </Button>
             </Link>
             <Link href="/dashboard">
               <Button variant="outline" className="w-full">

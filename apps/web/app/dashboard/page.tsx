@@ -9,35 +9,36 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/lib/auth';
 import { RadarChart } from '@/components/charts/radar-chart';
+import { getAllCompleted, hasCompletedTest } from '@/lib/test-session';
 
 const testCategories = [
   {
     category: '성격 검사',
     tests: [
-      { code: 'mbti', name: 'MBTI', description: '16가지 성격 유형 분석', questions: 48 },
-      { code: 'disc', name: 'DISC', description: '행동 유형 분석', questions: 28 },
-      { code: 'enneagram', name: '에니어그램', description: '9가지 성격 유형', questions: 36 },
-      { code: 'tci', name: 'TCI', description: '기질 및 성격 검사', questions: 140 },
+      { code: 'mbti', name: 'MBTI', description: '16가지 성격 유형 분석', questions: 48, available: true },
+      { code: 'disc', name: 'DISC', description: '행동 유형 분석', questions: 28, available: false },
+      { code: 'enneagram', name: '에니어그램', description: '9가지 성격 유형', questions: 36, available: false },
+      { code: 'tci', name: 'TCI', description: '기질 및 성격 검사', questions: 140, available: false },
     ],
   },
   {
     category: '적성/역량 검사',
     tests: [
-      { code: 'gallup', name: 'Gallup 강점', description: '34개 강점 테마', questions: 34 },
-      { code: 'holland', name: 'Holland', description: '직업 흥미 유형', questions: 42 },
-      { code: 'iq', name: 'IQ 테스트', description: '논리/패턴 분석', questions: 30 },
-      { code: 'mmpi', name: 'MMPI 간이', description: '다면적 인성 검사', questions: 50 },
+      { code: 'gallup', name: 'Gallup 강점', description: '34개 강점 테마', questions: 34, available: false },
+      { code: 'holland', name: 'Holland', description: '직업 흥미 유형', questions: 42, available: false },
+      { code: 'iq', name: 'IQ 테스트', description: '논리/패턴 분석', questions: 30, available: false },
+      { code: 'mmpi', name: 'MMPI 간이', description: '다면적 인성 검사', questions: 50, available: false },
     ],
   },
   {
     category: '전통/특수 검사',
     tests: [
-      { code: 'tarot', name: '타로', description: '이미지 선택 기반', questions: 10 },
-      { code: 'htp', name: 'HTP', description: '그림 심리 검사', questions: 3 },
-      { code: 'saju', name: '사주', description: '생년월일시 분석', questions: 1 },
-      { code: 'sasang', name: '사상체질', description: '체질 유형 분석', questions: 20 },
-      { code: 'face', name: '관상', description: '얼굴 분석', questions: 1 },
-      { code: 'blood', name: '혈액형', description: '혈액형 성격 분석', questions: 5 },
+      { code: 'tarot', name: '타로', description: '이미지 선택 기반', questions: 10, available: false },
+      { code: 'htp', name: 'HTP', description: '그림 심리 검사', questions: 3, available: false },
+      { code: 'saju', name: '사주', description: '생년월일시 분석', questions: 1, available: false },
+      { code: 'sasang', name: '사상체질', description: '체질 유형 분석', questions: 20, available: false },
+      { code: 'face', name: '관상', description: '얼굴 분석', questions: 1, available: false },
+      { code: 'blood', name: '혈액형', description: '혈액형 성격 분석', questions: 5, available: false },
     ],
   },
 ];
@@ -53,6 +54,12 @@ export default function DashboardPage() {
       fetchUser();
     }
   }, [isAuthenticated, fetchUser]);
+
+  // localStorage에서 완료된 검사 로드
+  useEffect(() => {
+    const completed = getAllCompleted();
+    setCompletedTests(completed.map((s) => s.testCode));
+  }, []);
 
   const totalTests = 14;
   const completionRate = (completedTests.length / totalTests) * 100;
@@ -119,9 +126,12 @@ export default function DashboardPage() {
                   <p className="text-muted-foreground mb-4">
                     아직 완료한 검사가 없습니다.
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground mb-4">
                     검사를 완료하면 능력치 레이더 차트가 표시됩니다.
                   </p>
+                  <Link href="/mbti">
+                    <Button>MBTI 검사 시작하기</Button>
+                  </Link>
                 </div>
               )}
             </CardContent>
@@ -139,18 +149,18 @@ export default function DashboardPage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {category.tests.map((test) => {
-                    const isCompleted = completedTests.includes(test.code);
+                    const isCompleted = hasCompletedTest(test.code);
                     return (
                       <Card
                         key={test.code}
-                        className={isCompleted ? 'border-green-500' : ''}
+                        className={`${isCompleted ? 'border-green-500' : ''} ${!test.available ? 'opacity-60' : ''}`}
                       >
                         <CardHeader className="pb-2">
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">{test.name}</CardTitle>
                             {isCompleted && (
                               <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                완료
+                                무료 미리보기
                               </span>
                             )}
                           </div>
@@ -158,17 +168,35 @@ export default function DashboardPage() {
                         </CardHeader>
                         <CardContent>
                           <p className="text-sm text-muted-foreground mb-4">
-                            {test.questions}문항
+                            {test.questions}문항 {!test.available && '· 준비 중'}
                           </p>
-                          <Link href={`/${test.code}`}>
-                            <Button
-                              variant={isCompleted ? 'outline' : 'default'}
-                              size="sm"
-                              className="w-full"
-                            >
-                              {isCompleted ? '결과 보기' : '검사하기'}
-                            </Button>
-                          </Link>
+                          <div className="flex flex-col gap-2">
+                            {isCompleted ? (
+                              <>
+                                <Link href={`/results/${test.code}/preview`}>
+                                  <Button variant="outline" size="sm" className="w-full">
+                                    결과 보기
+                                  </Button>
+                                </Link>
+                                <Link href={`/checkout?testCode=${test.code}`}>
+                                  <Button size="sm" className="w-full">
+                                    잠금 해제
+                                  </Button>
+                                </Link>
+                              </>
+                            ) : (
+                              <Link href={test.available ? `/${test.code}` : '#'}>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  className="w-full"
+                                  disabled={!test.available}
+                                >
+                                  {test.available ? '검사하기' : '준비 중'}
+                                </Button>
+                              </Link>
+                            )}
+                          </div>
                         </CardContent>
                       </Card>
                     );

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/lib/auth';
+import { getTestMeta } from '@/data/tests';
 
 const PLANS = [
   {
@@ -30,24 +31,26 @@ const PLANS = [
   },
 ];
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const testCode = searchParams.get('testCode');
   const { token, isAuthenticated } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState<string>('pro');
   const [loading, setLoading] = useState(false);
 
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const testMeta = testCode ? getTestMeta(testCode) : null;
 
   const handlePayment = async () => {
     if (!isAuthenticated) {
-      router.push('/login');
+      router.push(`/login?redirect=/checkout${testCode ? `?testCode=${testCode}` : ''}`);
       return;
     }
 
     setLoading(true);
 
     try {
-      // Prepare payment
       const response = await fetch(`${API_URL}/api/payments/prepare`, {
         method: 'POST',
         headers: {
@@ -61,13 +64,7 @@ export default function CheckoutPage() {
 
       if (response.ok) {
         const paymentData = await response.json();
-
-        // In production, redirect to Toss Payments
-        // For demo, simulate success
-        console.log('Payment prepared:', paymentData);
-
-        // Simulate payment success
-        router.push('/payment/success?orderId=' + paymentData.order_id);
+        router.push(`/payment/success?orderId=${paymentData.order_id}${testCode ? `&testCode=${testCode}` : ''}`);
       }
     } catch (error) {
       console.error('Payment error:', error);
@@ -82,14 +79,45 @@ export default function CheckoutPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/dashboard" className="text-xl font-bold text-primary">
+          <Link href="/" className="text-xl font-bold text-primary">
             Metaphoi
           </Link>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8 text-center">리포트 구매</h1>
+        {/* 검사 컨텍스트 메시지 */}
+        {testMeta && (
+          <div className="text-center mb-6 p-4 bg-primary/5 rounded-lg">
+            <p className="text-lg font-medium">
+              {testMeta.name} 전체 분석을 잠금 해제하세요
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              상세 성격 분석, 강점/약점, 직업 추천 등 전체 결과를 확인할 수 있습니다
+            </p>
+          </div>
+        )}
+
+        <h1 className="text-3xl font-bold mb-8 text-center">
+          {testMeta ? '전체 결과 잠금 해제' : '리포트 구매'}
+        </h1>
+
+        {/* 비로그인 안내 */}
+        {!isAuthenticated && (
+          <Card className="mb-8 border-orange-200 bg-orange-50 dark:bg-orange-950/20">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-orange-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <div>
+                  <p className="text-sm font-medium">결제하려면 로그인이 필요합니다</p>
+                  <p className="text-xs text-muted-foreground">결제 버튼을 누르면 로그인 페이지로 이동합니다. 결과는 계정에 영구 저장됩니다.</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Plan Selection */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -146,6 +174,12 @@ export default function CheckoutPage() {
             <CardTitle>주문 요약</CardTitle>
           </CardHeader>
           <CardContent>
+            {testMeta && (
+              <div className="flex justify-between items-center py-2 border-b text-sm text-muted-foreground">
+                <span>검사</span>
+                <span>{testMeta.name}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center py-2 border-b">
               <span>{plan?.name} 리포트</span>
               <span>{plan?.price.toLocaleString()}원</span>
@@ -174,5 +208,19 @@ export default function CheckoutPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto" />
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }
