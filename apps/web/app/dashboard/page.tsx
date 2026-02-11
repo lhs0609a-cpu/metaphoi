@@ -6,47 +6,21 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/lib/auth';
 import { RadarChart } from '@/components/charts/radar-chart';
-import { getAllCompleted, hasCompletedTest } from '@/lib/test-session';
-
-const testCategories = [
-  {
-    category: '성격 검사',
-    tests: [
-      { code: 'mbti', name: 'MBTI', description: '16가지 성격 유형 분석', questions: 48, available: true },
-      { code: 'disc', name: 'DISC', description: '행동 유형 분석', questions: 28, available: true },
-      { code: 'enneagram', name: '에니어그램', description: '9가지 성격 유형', questions: 36, available: true },
-      { code: 'tci', name: 'TCI', description: '기질 및 성격 검사', questions: 140, available: false },
-    ],
-  },
-  {
-    category: '적성/역량 검사',
-    tests: [
-      { code: 'gallup', name: 'Gallup 강점', description: '34개 강점 테마', questions: 34, available: false },
-      { code: 'holland', name: 'Holland', description: '직업 흥미 유형', questions: 42, available: true },
-      { code: 'iq', name: 'IQ 테스트', description: '논리/패턴 분석', questions: 30, available: false },
-      { code: 'mmpi', name: 'MMPI 간이', description: '다면적 인성 검사', questions: 50, available: false },
-    ],
-  },
-  {
-    category: '전통/특수 검사',
-    tests: [
-      { code: 'tarot', name: '타로', description: '이미지 선택 기반', questions: 10, available: false },
-      { code: 'htp', name: 'HTP', description: '그림 심리 검사', questions: 3, available: false },
-      { code: 'saju', name: '사주', description: '생년월일시 사주팔자', questions: 5, available: true },
-      { code: 'sasang', name: '사상체질', description: '체질 유형 분석', questions: 20, available: true },
-      { code: 'face', name: '관상', description: '얼굴 분석', questions: 1, available: false },
-      { code: 'blood', name: '혈액형', description: '혈액형 성격 분석', questions: 5, available: true },
-    ],
-  },
-];
+import {
+  hasCompletedComprehensive,
+  getComprehensiveSession,
+  saveComprehensiveProgress,
+} from '@/lib/test-session';
+import { api } from '@/lib/api';
+import { type ComprehensiveProfile } from '@/data/tests/comprehensive';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, isAuthenticated, fetchUser, logout } = useAuth();
-  const [completedTests, setCompletedTests] = useState<string[]>([]);
+  const { user, token, isAuthenticated, fetchUser, logout } = useAuth();
+  const [profile, setProfile] = useState<ComprehensiveProfile | null>(null);
+  const [hasComprehensive, setHasComprehensive] = useState(false);
   const [abilitiesData, setAbilitiesData] = useState<any>(null);
 
   useEffect(() => {
@@ -55,14 +29,38 @@ export default function DashboardPage() {
     }
   }, [isAuthenticated, fetchUser]);
 
-  // localStorage에서 완료된 검사 로드
   useEffect(() => {
-    const completed = getAllCompleted();
-    setCompletedTests(completed.map((s) => s.testCode));
-  }, []);
+    // 1. localStorage에서 먼저 확인
+    const completed = hasCompletedComprehensive();
+    if (completed) {
+      const session = getComprehensiveSession();
+      if (session?.profile) {
+        setProfile(session.profile);
+        setHasComprehensive(true);
+        return;
+      }
+    }
 
-  const totalTests = 14;
-  const completionRate = (completedTests.length / totalTests) * 100;
+    // 2. localStorage에 없으면 서버에서 불러오기
+    if (token) {
+      api.results.getComprehensive(token).then((res) => {
+        if (res.data) {
+          const serverResult = res.data as any;
+          if (serverResult.result?.comprehensive_profile) {
+            const serverProfile = serverResult.result.comprehensive_profile;
+            setProfile(serverProfile);
+            setHasComprehensive(true);
+            // 서버 데이터를 localStorage에도 캐시
+            saveComprehensiveProgress({
+              profile: serverProfile,
+              currentStep: 'done',
+              completedAt: serverResult.result.updated_at || new Date().toISOString(),
+            });
+          }
+        }
+      });
+    }
+  }, [token]);
 
   const handleLogout = () => {
     logout();
@@ -89,25 +87,79 @@ export default function DashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        {/* Progress Section */}
+        {/* 종합 검사 결과 */}
         <section className="mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>검사 진행률</CardTitle>
+              <CardTitle>종합 심리검사 결과</CardTitle>
               <CardDescription>
-                {completedTests.length}개 / {totalTests}개 검사 완료
+                {hasComprehensive
+                  ? '7가지 검사 종합 분석이 완료되었습니다'
+                  : '종합 심리검사를 진행해보세요'}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Progress value={completionRate} className="h-3" />
-              <p className="mt-2 text-sm text-muted-foreground">
-                모든 검사를 완료하면 더 정확한 능력치 분석을 받을 수 있습니다.
-              </p>
+              {hasComprehensive && profile ? (
+                <div className="space-y-6">
+                  {/* 유형 요약 */}
+                  <div className="text-center">
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {profile.personalInfo.name}님의 종합 유형
+                    </p>
+                    <p className="text-2xl font-bold text-primary mb-2">
+                      {profile.summary.headline}
+                    </p>
+                    <p className="text-sm text-muted-foreground max-w-lg mx-auto">
+                      {profile.summary.personality.slice(0, 120)}...
+                    </p>
+                  </div>
+
+                  {/* 유형 뱃지 */}
+                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
+                    {[
+                      { label: 'MBTI', value: profile.mbti.type },
+                      { label: 'DISC', value: profile.disc.type },
+                      { label: '에니어그램', value: profile.enneagram.wing },
+                      { label: 'Holland', value: profile.holland.topCode },
+                      { label: '사상', value: profile.sasang.type },
+                      { label: '오행', value: profile.saju.dominant },
+                      { label: '혈액형', value: `${profile.blood.type}형` },
+                    ].map((item) => (
+                      <div key={item.label} className="text-center p-2 rounded-lg bg-muted/50">
+                        <p className="text-[10px] text-muted-foreground">{item.label}</p>
+                        <p className="text-sm font-bold text-primary">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA */}
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                    <Link href="/results/preview">
+                      <Button variant="outline">무료 결과 보기</Button>
+                    </Link>
+                    <Link href="/checkout?testCode=comprehensive">
+                      <Button>전체 분석 잠금 해제</Button>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground mb-4">
+                    아직 종합 검사를 완료하지 않았습니다.
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    7가지 검사를 한 번에 진행하고 종합 분석 결과를 확인하세요.
+                  </p>
+                  <Link href="/test">
+                    <Button size="lg">종합 검사 시작하기</Button>
+                  </Link>
+                </div>
+              )}
             </CardContent>
           </Card>
         </section>
 
-        {/* Abilities Overview */}
+        {/* 능력치 */}
         <section className="mb-8">
           <Card>
             <CardHeader>
@@ -117,98 +169,23 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {completedTests.length > 0 ? (
+              {hasComprehensive ? (
                 <div className="h-[400px]">
                   <RadarChart data={abilitiesData} />
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">
-                    아직 완료한 검사가 없습니다.
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground text-sm">
+                    종합 검사를 완료하면 능력치 레이더 차트가 표시됩니다.
                   </p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    검사를 완료하면 능력치 레이더 차트가 표시됩니다.
-                  </p>
-                  <Link href="/mbti">
-                    <Button>MBTI 검사 시작하기</Button>
-                  </Link>
                 </div>
               )}
             </CardContent>
           </Card>
         </section>
 
-        {/* Tests Section */}
+        {/* 리포트 구매 */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">검사 목록</h2>
-          <div className="space-y-8">
-            {testCategories.map((category) => (
-              <div key={category.category}>
-                <h3 className="text-lg font-semibold mb-4 text-primary">
-                  {category.category}
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {category.tests.map((test) => {
-                    const isCompleted = hasCompletedTest(test.code);
-                    return (
-                      <Card
-                        key={test.code}
-                        className={`${isCompleted ? 'border-green-500' : ''} ${!test.available ? 'opacity-60' : ''}`}
-                      >
-                        <CardHeader className="pb-2">
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">{test.name}</CardTitle>
-                            {isCompleted && (
-                              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
-                                무료 미리보기
-                              </span>
-                            )}
-                          </div>
-                          <CardDescription>{test.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            {test.questions}문항 {!test.available && '· 준비 중'}
-                          </p>
-                          <div className="flex flex-col gap-2">
-                            {isCompleted ? (
-                              <>
-                                <Link href={`/results/${test.code}/preview`}>
-                                  <Button variant="outline" size="sm" className="w-full">
-                                    결과 보기
-                                  </Button>
-                                </Link>
-                                <Link href={`/checkout?testCode=${test.code}`}>
-                                  <Button size="sm" className="w-full">
-                                    잠금 해제
-                                  </Button>
-                                </Link>
-                              </>
-                            ) : (
-                              <Link href={test.available ? `/${test.code}` : '#'}>
-                                <Button
-                                  variant="default"
-                                  size="sm"
-                                  className="w-full"
-                                  disabled={!test.available}
-                                >
-                                  {test.available ? '검사하기' : '준비 중'}
-                                </Button>
-                              </Link>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Report Section */}
-        <section className="mt-12">
           <Card>
             <CardHeader>
               <CardTitle>종합 리포트</CardTitle>
@@ -219,9 +196,9 @@ export default function DashboardPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { tier: 'Basic', price: '9,900원', features: ['30개 능력치', '레이더 차트', '결과 요약'] },
-                  { tier: 'Pro', price: '29,900원', features: ['상세 분석', '직업 추천', 'PDF 내보내기'], recommended: true },
-                  { tier: 'Premium', price: '59,900원', features: ['성장 로드맵', 'AI 1:1 상담'] },
+                  { tier: 'Basic', price: '9,900원', features: ['30개 능력치', '레이더 차트', '유형별 상세 해석'] },
+                  { tier: 'Pro', price: '29,900원', features: ['교차 심층 분석', '직업 추천 TOP 10', 'PDF 내보내기'], recommended: true },
+                  { tier: 'Premium', price: '59,900원', features: ['성장 로드맵', 'AI 1:1 상담', '기업용 리포트'] },
                 ].map((plan) => (
                   <Card key={plan.tier} className={plan.recommended ? 'border-primary' : ''}>
                     <CardHeader>
@@ -244,11 +221,11 @@ export default function DashboardPage() {
                           </li>
                         ))}
                       </ul>
-                      <Link href="/checkout">
+                      <Link href="/checkout?testCode=comprehensive">
                         <Button
                           variant={plan.recommended ? 'default' : 'outline'}
                           className="w-full"
-                          disabled={completedTests.length === 0}
+                          disabled={!hasComprehensive}
                         >
                           구매하기
                         </Button>
@@ -257,9 +234,9 @@ export default function DashboardPage() {
                   </Card>
                 ))}
               </div>
-              {completedTests.length === 0 && (
+              {!hasComprehensive && (
                 <p className="text-center text-sm text-muted-foreground mt-4">
-                  리포트를 구매하려면 최소 1개 이상의 검사를 완료해야 합니다.
+                  리포트를 구매하려면 종합 검사를 먼저 완료해야 합니다.
                 </p>
               )}
             </CardContent>

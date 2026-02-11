@@ -20,6 +20,7 @@ interface AuthState {
   signup: (data: { email: string; password: string; name?: string }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   fetchUser: () => Promise<void>;
+  syncResults: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -63,6 +64,9 @@ export const useAuthStore = create<AuthState>()(
           // Fetch user info
           await get().fetchUser();
 
+          // 검사 결과 자동 동기화
+          await get().syncResults();
+
           return { success: true };
         } catch (error) {
           return { success: false, error: 'Network error' };
@@ -83,6 +87,9 @@ export const useAuthStore = create<AuthState>()(
           if (response.data) {
             set({ token: (response.data as any).access_token });
             await get().fetchUser();
+
+            // 검사 결과 자동 동기화
+            await get().syncResults();
           }
 
           return { success: true };
@@ -121,6 +128,35 @@ export const useAuthStore = create<AuthState>()(
           set({ user: null, token: null });
         }
       },
+
+      syncResults: async () => {
+        const token = get().token;
+        if (!token || typeof window === 'undefined') return;
+
+        try {
+          const raw = localStorage.getItem('metaphoi_comprehensive');
+          if (!raw) return;
+
+          const session = JSON.parse(raw);
+          if (!session.profile || !session.completedAt) return;
+
+          const response = await api.results.saveComprehensive(
+            {
+              comprehensive_profile: session.profile,
+              abilities_snapshot: session.profile.abilities || [],
+              personal_info: session.personalInfo || null,
+              answers: session.answers || null,
+            },
+            token,
+          );
+
+          if (response.data) {
+            console.log('Comprehensive results synced to server');
+          }
+        } catch {
+          // 동기화 실패해도 로그인은 계속 진행
+        }
+      },
     }),
     {
       name: 'auth-storage',
@@ -140,5 +176,6 @@ export function useAuth() {
     signup: store.signup,
     logout: store.logout,
     fetchUser: store.fetchUser,
+    syncResults: store.syncResults,
   };
 }

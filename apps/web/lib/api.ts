@@ -70,6 +70,21 @@ export const api = {
   results: {
     list: () => request('/api/results'),
     get: (testCode: string) => request(`/api/results/${testCode}`),
+    saveComprehensive: (data: {
+      comprehensive_profile: any;
+      abilities_snapshot: any;
+      personal_info?: any;
+      answers?: any;
+    }, token: string) =>
+      request('/api/results/comprehensive', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    getComprehensive: (token: string) =>
+      request('/api/results/comprehensive', {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 
   // Abilities
@@ -95,7 +110,7 @@ export const api = {
     prepare: (data: { reportType: string; amount: number }) =>
       request('/api/payments/prepare', {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify({ report_type: data.reportType }),
       }),
     confirm: (data: { paymentKey: string; orderId: string; amount: number }) =>
       request('/api/payments/confirm', {
@@ -103,5 +118,9 @@ export const api = {
         body: JSON.stringify(data),
       }),
     get: (id: string) => request(`/api/payments/${id}`),
+    myStatus: (token: string) =>
+      request('/api/payments/status/me', {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
   },
 };

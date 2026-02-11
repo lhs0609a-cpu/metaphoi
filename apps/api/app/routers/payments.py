@@ -8,6 +8,7 @@ from app.services.payment_service import (
     confirm_payment,
     get_payment,
 )
+from app.services.supabase_client import get_supabase
 from app.routers.auth import get_current_user
 
 router = APIRouter()
@@ -57,7 +58,77 @@ async def confirm(
             detail="Payment confirmation failed",
         )
 
+    # 결제 성공 시 리포트 자동 생성
+    supabase = get_supabase()
+    payment = (
+        supabase.table("payments")
+        .select("*")
+        .eq("order_id", request.order_id)
+        .single()
+        .execute()
+    )
+
+    if payment.data:
+        # report_type 결정 (가격으로 역추론)
+        price_to_type = {9900: "basic", 29900: "pro", 59900: "premium"}
+        report_type = price_to_type.get(request.amount, "basic")
+
+        # 리포트 생성
+        report_result = (
+            supabase.table("reports")
+            .insert({
+                "user_id": current_user["id"],
+                "report_type": report_type,
+                "report_data": {"payment_id": payment.data["id"], "unlocked": True},
+            })
+            .execute()
+        )
+
+        # 결제에 리포트 ID 연결
+        if report_result.data:
+            supabase.table("payments").update(
+                {"report_id": report_result.data[0]["id"]}
+            ).eq("id", payment.data["id"]).execute()
+
     return result
+
+
+@router.get("/status/me")
+async def get_my_payment_status(
+    current_user: Annotated[dict, Depends(get_current_user)],
+):
+    """현재 사용자의 결제/리포트 상태 확인"""
+    supabase = get_supabase()
+
+    # 완료된 결제가 있는지 확인
+    payments = (
+        supabase.table("payments")
+        .select("*, reports(*)")
+        .eq("user_id", current_user["id"])
+        .eq("status", "completed")
+        .order("paid_at", desc=True)
+        .execute()
+    )
+
+    if not payments.data:
+        return {"has_paid": False, "report_type": None}
+
+    # 가장 높은 등급의 리포트 반환
+    tier_rank = {"premium": 3, "pro": 2, "basic": 1}
+    best = max(
+        payments.data,
+        key=lambda p: tier_rank.get(
+            (p.get("reports") or {}).get("report_type", ""),
+            0,
+        ),
+    )
+
+    report = best.get("reports") or {}
+    return {
+        "has_paid": True,
+        "report_type": report.get("report_type"),
+        "report_id": report.get("id"),
+    }
 
 
 @router.get("/{payment_id}")

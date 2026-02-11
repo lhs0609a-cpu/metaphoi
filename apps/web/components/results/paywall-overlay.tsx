@@ -41,7 +41,7 @@ export function PaywallOverlay({ testCode, children }: PaywallOverlayProps) {
           <div className="flex flex-col gap-3">
             <Link href={`/checkout?testCode=${testCode}`}>
               <Button size="lg" className="w-full">
-                전체 결과 보기 - 9,900원부터
+                전체 분석 보기 - 9,900원부터
               </Button>
             </Link>
             <Link href="/signup">
