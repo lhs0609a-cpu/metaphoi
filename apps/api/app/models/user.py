@@ -59,3 +59,4 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     user_id: Optional[str] = None
+    token_type: Optional[str] = "user"

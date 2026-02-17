@@ -29,6 +29,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
             minutes=settings.access_token_expire_minutes
         )
     to_encode.update({"exp": expire})
+    if "token_type" not in to_encode:
+        to_encode["token_type"] = "user"
     encoded_jwt = jwt.encode(
         to_encode, settings.jwt_secret_key, algorithm=settings.jwt_algorithm
     )
@@ -43,7 +45,9 @@ def decode_token(token: str) -> Optional[TokenData]:
         user_id: str = payload.get("sub")
         if user_id is None:
             return None
-        return TokenData(user_id=user_id)
+        token_data = TokenData(user_id=user_id)
+        token_data.token_type = payload.get("token_type", "user")
+        return token_data
     except JWTError:
         return None
 

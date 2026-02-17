@@ -5,20 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { useAuth } from '@/lib/auth';
-
-interface Question {
-  id: number;
-  question_number: number;
-  question_type: string;
-  question_text: string;
-  options?: {
-    scale?: number[];
-    labels?: string[];
-    choices?: string[];
-  };
-  scoring_weights?: Record<string, number>;
-}
+import { getTestQuestions, getTestMeta } from '@/data/tests';
+import { scoreTest } from '@/lib/test-engine';
+import { saveProgress, completeTest, getSession } from '@/lib/test-session';
 
 interface TestContainerProps {
   testCode: string;
@@ -27,48 +16,30 @@ interface TestContainerProps {
 
 export function TestContainer({ testCode, testName }: TestContainerProps) {
   const router = useRouter();
-  const { token, isAuthenticated } = useAuth();
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<number, unknown>>({});
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [answers, setAnswers] = useState<Record<number, number | string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [startTime, setStartTime] = useState<number>(Date.now());
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  const questions = getTestQuestions(testCode);
+  const testMeta = getTestMeta(testCode);
 
+  // 이전 진행 상태 복원
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
+    const session = getSession(testCode);
+    if (session && !session.completedAt) {
+      setAnswers(session.answers);
+      setCurrentIndex(session.currentIndex);
     }
+  }, [testCode]);
 
-    const startTest = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/tests/${testCode}/start`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+  // 답변 변경 시 자동 저장
+  useEffect(() => {
+    if (Object.keys(answers).length > 0) {
+      saveProgress(testCode, answers, currentIndex);
+    }
+  }, [answers, currentIndex, testCode]);
 
-        if (response.ok) {
-          const data = await response.json();
-          setSessionId(data.session.id);
-          setQuestions(data.questions);
-        }
-      } catch (error) {
-        console.error('Failed to start test:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    startTest();
-  }, [testCode, token, isAuthenticated, router, API_URL]);
-
-  const handleAnswer = useCallback((questionId: number, answer: unknown) => {
+  const handleAnswer = useCallback((questionId: number, answer: number | string) => {
     setAnswers((prev) => ({
       ...prev,
       [questionId]: answer,
@@ -78,7 +49,6 @@ export function TestContainer({ testCode, testName }: TestContainerProps) {
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
-      setStartTime(Date.now());
     }
   };
 
@@ -88,73 +58,30 @@ export function TestContainer({ testCode, testName }: TestContainerProps) {
     }
   };
 
-  const handleSubmit = async () => {
-    if (!sessionId) return;
-
+  const handleSubmit = () => {
     setSubmitting(true);
 
-    try {
-      // Submit all answers
-      const responseData = Object.entries(answers).map(([questionId, answer]) => ({
-        question_id: parseInt(questionId),
-        answer,
-        response_time_ms: 5000, // Simplified for demo
-      }));
+    const result = scoreTest(testCode, questions, answers);
 
-      await fetch(`${API_URL}/api/tests/${testCode}/submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          session_id: sessionId,
-          answers: responseData,
-        }),
-      });
-
-      // Complete the test
-      const completeResponse = await fetch(
-        `${API_URL}/api/tests/${testCode}/complete?session_id=${sessionId}`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (completeResponse.ok) {
-        router.push(`/results/${testCode}`);
-      }
-    } catch (error) {
-      console.error('Failed to submit test:', error);
-    } finally {
+    if (result) {
+      completeTest(testCode, result);
+      router.push(`/results/${testCode}/preview`);
+    } else {
+      console.error('Scoring failed for test:', testCode);
       setSubmitting(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">검사를 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (questions.length === 0) {
+  if (!testMeta?.available || questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="text-center py-8">
             <p className="text-muted-foreground mb-4">
-              아직 준비된 문항이 없습니다.
+              이 검사는 아직 준비 중입니다.
             </p>
-            <Button onClick={() => router.push('/dashboard')}>
-              대시보드로 돌아가기
+            <Button onClick={() => router.push('/')}>
+              홈으로 돌아가기
             </Button>
           </CardContent>
         </Card>
@@ -184,11 +111,11 @@ export function TestContainer({ testCode, testName }: TestContainerProps) {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-lg font-normal leading-relaxed">
-              {currentQuestion.question_text}
+              {currentQuestion.questionText}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {currentQuestion.question_type === 'likert' && currentQuestion.options?.scale && (
+            {currentQuestion.questionType === 'likert' && currentQuestion.options?.scale && (
               <div className="space-y-3">
                 {currentQuestion.options.scale.map((value, index) => (
                   <button
@@ -207,7 +134,7 @@ export function TestContainer({ testCode, testName }: TestContainerProps) {
               </div>
             )}
 
-            {currentQuestion.question_type === 'choice' && currentQuestion.options?.choices && (
+            {currentQuestion.questionType === 'choice' && currentQuestion.options?.choices && (
               <div className="space-y-3">
                 {currentQuestion.options.choices.map((choice, index) => (
                   <button
@@ -242,7 +169,7 @@ export function TestContainer({ testCode, testName }: TestContainerProps) {
               onClick={handleSubmit}
               disabled={submitting || Object.keys(answers).length < questions.length}
             >
-              {submitting ? '제출 중...' : '검사 완료'}
+              {submitting ? '채점 중...' : '검사 완료'}
             </Button>
           ) : (
             <Button
@@ -255,7 +182,7 @@ export function TestContainer({ testCode, testName }: TestContainerProps) {
         </div>
 
         {/* Progress Indicator */}
-        <div className="mt-6 flex justify-center gap-1">
+        <div className="mt-6 flex justify-center gap-1 flex-wrap">
           {questions.map((_, index) => (
             <div
               key={index}
