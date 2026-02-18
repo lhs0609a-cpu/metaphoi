@@ -125,6 +125,14 @@ export function ComprehensiveTestContainer() {
     setAnswers((prev) => ({ ...prev, [questionId]: answer }));
   }, []);
 
+  // 첫 번째 미응답 문항 인덱스 찾기
+  const findFirstUnanswered = useCallback((): number => {
+    for (let i = 0; i < questions.length; i++) {
+      if (answers[questions[i].id] === undefined) return i;
+    }
+    return -1;
+  }, [questions, answers]);
+
   const handleNext = () => {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex((prev) => prev + 1);
@@ -136,6 +144,11 @@ export function ComprehensiveTestContainer() {
       setCurrentIndex((prev) => prev - 1);
     }
   };
+
+  const handleGoToUnanswered = useCallback(() => {
+    const idx = findFirstUnanswered();
+    if (idx >= 0) setCurrentIndex(idx);
+  }, [findFirstUnanswered]);
 
   const handleAutoAdvance = useCallback((answeredIndex: number) => {
     const milestone = getMilestoneFeedback(answeredIndex, questions.length);
@@ -389,6 +402,30 @@ export function ComprehensiveTestContainer() {
           </CardContent>
         </Card>
 
+        {/* 미응답 문항 경고 */}
+        {remaining > 0 && answeredCount > 0 && safeIndex >= questions.length - 3 && (
+          <div className="mb-4 px-4 py-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <svg className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <span className="font-semibold">{remaining}개 문항</span>이 미응답입니다
+                </p>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                className="shrink-0 border-amber-300 text-amber-800 dark:text-amber-200 hover:bg-amber-100 dark:hover:bg-amber-900/30"
+                onClick={handleGoToUnanswered}
+              >
+                미응답 문항으로
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Navigation */}
         <div className="flex justify-between">
           <Button
@@ -399,18 +436,26 @@ export function ComprehensiveTestContainer() {
             이전
           </Button>
 
-          {safeIndex === questions.length - 1 ? (
+          {answeredCount >= questions.length ? (
             <Button
               onClick={handleSubmit}
-              disabled={submitting || answeredCount < questions.length}
+              disabled={submitting}
             >
               {submitting ? '분석 중...' : '결과 보기'}
             </Button>
-          ) : (
+          ) : currentAnswer === undefined ? (
+            <Button disabled>
+              선택지를 골라주세요
+            </Button>
+          ) : safeIndex === questions.length - 1 ? (
             <Button
-              onClick={handleNext}
-              disabled={currentAnswer === undefined}
+              variant="outline"
+              onClick={handleGoToUnanswered}
             >
+              미응답 {remaining}개 문항으로
+            </Button>
+          ) : (
+            <Button onClick={handleNext}>
               다음
             </Button>
           )}
