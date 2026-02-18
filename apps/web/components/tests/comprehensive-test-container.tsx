@@ -143,7 +143,7 @@ export function ComprehensiveTestContainer() {
       setMilestoneMessage(milestone);
       setShowMilestone(true);
     } else if (answeredIndex < questions.length - 1) {
-      setTimeout(() => setCurrentIndex((prev) => prev + 1), 300);
+      setTimeout(() => setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1)), 300);
     }
   }, [questions.length]);
 
@@ -151,7 +151,7 @@ export function ComprehensiveTestContainer() {
     setShowMilestone(false);
     setMilestoneMessage(null);
     if (currentIndex < questions.length - 1) {
-      setCurrentIndex((prev) => prev + 1);
+      setCurrentIndex((prev) => Math.min(prev + 1, questions.length - 1));
     }
   }, [currentIndex, questions.length]);
 
@@ -242,8 +242,22 @@ export function ComprehensiveTestContainer() {
   }
 
   // Step 2: 질문 응답
-  const currentQuestion = questions[currentIndex];
-  const progress = ((currentIndex + 1) / questions.length) * 100;
+  const safeIndex = Math.min(currentIndex, questions.length - 1);
+  const currentQuestion = questions[safeIndex];
+  if (!currentQuestion) {
+    // 문항이 없는 경우 안전하게 처리
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground mb-4">문항을 불러올 수 없습니다.</p>
+          <Button onClick={() => { setStep('info'); setCurrentIndex(0); }}>
+            처음부터 다시 시작
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  const progress = ((safeIndex + 1) / questions.length) * 100;
   const currentAnswer = answers[currentQuestion.id];
   const answeredCount = Object.keys(answers).length;
   const remaining = questions.length - answeredCount;
@@ -306,7 +320,7 @@ export function ComprehensiveTestContainer() {
               {remaining > 0 ? `${remaining}문항 남음` : '마지막 문항!'}
             </p>
             <p className="text-xs text-muted-foreground">
-              {currentIndex + 1} / {questions.length}문항
+              {safeIndex + 1} / {questions.length}문항
             </p>
           </div>
         </div>
@@ -342,7 +356,7 @@ export function ComprehensiveTestContainer() {
                     }`}
                     onClick={() => {
                       handleAnswer(currentQuestion.id, value);
-                      handleAutoAdvance(currentIndex);
+                      handleAutoAdvance(safeIndex);
                     }}
                   >
                     <span className="font-medium">{value}.</span>{' '}
@@ -364,7 +378,7 @@ export function ComprehensiveTestContainer() {
                     }`}
                     onClick={() => {
                       handleAnswer(currentQuestion.id, index);
-                      handleAutoAdvance(currentIndex);
+                      handleAutoAdvance(safeIndex);
                     }}
                   >
                     {choice}
@@ -380,12 +394,12 @@ export function ComprehensiveTestContainer() {
           <Button
             variant="outline"
             onClick={handlePrevious}
-            disabled={currentIndex === 0}
+            disabled={safeIndex === 0}
           >
             이전
           </Button>
 
-          {currentIndex === questions.length - 1 ? (
+          {safeIndex === questions.length - 1 ? (
             <Button
               onClick={handleSubmit}
               disabled={submitting || answeredCount < questions.length}
@@ -408,7 +422,7 @@ export function ComprehensiveTestContainer() {
             <div
               key={index}
               className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                index === currentIndex
+                index === safeIndex
                   ? 'bg-primary scale-150'
                   : answers[questions[index].id] !== undefined
                   ? 'bg-primary/50'
