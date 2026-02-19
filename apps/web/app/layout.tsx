@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter, Geist_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono-stat' });
+const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono-stat' });
 
 export const metadata: Metadata = {
   title: 'Metaphoi (메타포이) - 종합 인재 평가 플랫폼',
@@ -52,7 +52,7 @@ export default function RootLayout({
         {/* 카카오톡 공유 SDK */}
         <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" async />
       </head>
-      <body className={`${inter.variable} ${geistMono.variable}`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
         {children}
         <Toaster />
       </body>
