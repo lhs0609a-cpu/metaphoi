@@ -304,7 +304,7 @@ function scoreSaju(
 
   let hourGanji: { cheongan: string; jiji: string } | undefined;
   if (hourIdx > 0) {
-    const dayCgIdx = CHEONGAN.indexOf(dayGanji.cheongan);
+    const dayCgIdx = (CHEONGAN as readonly string[]).indexOf(dayGanji.cheongan);
     hourGanji = getHourGanji(dayCgIdx, hourIdx - 1);
   }
 

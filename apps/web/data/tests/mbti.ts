@@ -9,6 +9,7 @@ export interface TestQuestion {
     choices?: string[];
   };
   scoringWeights: Record<string, number>;
+  polarity?: string;
 }
 
 // MBTI 16 유형 설명
@@ -137,6 +138,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '사람들과 어울리는 것이 에너지를 준다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 2,
@@ -145,6 +147,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '혼자만의 시간이 나를 충전시킨다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 3,
@@ -153,6 +156,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '파티나 모임에서 새로운 사람을 만나는 것이 즐겁다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 4,
@@ -161,6 +165,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '많은 사람들 속에 있으면 피곤함을 느낀다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 5,
@@ -169,6 +174,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '대화할 때 먼저 말을 꺼내는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 6,
@@ -177,6 +183,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '깊이 있는 대화를 소수의 친한 친구와 나누는 것을 선호한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 7,
@@ -185,6 +192,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '활동적이고 다양한 일을 동시에 하는 것이 좋다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 8,
@@ -193,6 +201,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '행동하기 전에 충분히 생각하는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 9,
@@ -201,6 +210,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '주변에 사람이 많을수록 기분이 좋아진다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 10,
@@ -209,6 +219,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '나만의 내면 세계가 풍부하다고 생각한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 11,
@@ -217,6 +228,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '팀으로 일하는 것이 혼자 일하는 것보다 효율적이라 느낀다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 12,
@@ -225,6 +237,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '조용한 환경에서 집중이 더 잘 된다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
 
   // ===== S-N 차원 (12문항) =====
@@ -235,6 +248,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '구체적인 사실과 데이터를 중시한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 14,
@@ -243,6 +257,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '미래의 가능성과 큰 그림을 보는 것을 좋아한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { N: 1 },
+    polarity: 'N',
   },
   {
     id: 15,
@@ -251,6 +266,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '경험에 기반하여 판단하는 것이 편하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 16,
@@ -259,6 +275,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '상상력이 풍부하며 추상적인 개념에 끌린다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { N: 1 },
+    polarity: 'N',
   },
   {
     id: 17,
@@ -267,6 +284,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '단계별로 차근차근 일을 진행하는 것을 선호한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 18,
@@ -275,6 +293,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '패턴이나 연결고리를 발견하는 것이 재미있다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { N: 1 },
+    polarity: 'N',
   },
   {
     id: 19,
@@ -283,6 +302,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '현실적이고 실용적인 접근을 중시한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 20,
@@ -291,6 +311,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '새로운 아이디어와 이론을 탐구하는 것이 즐겁다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { N: 1 },
+    polarity: 'N',
   },
   {
     id: 21,
@@ -299,6 +320,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '세부사항에 주의를 기울이는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 22,
@@ -307,6 +329,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '비유와 상징적 표현에 민감한 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { N: 1 },
+    polarity: 'N',
   },
   {
     id: 23,
@@ -315,6 +338,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '증명된 방법을 따르는 것이 안전하다고 생각한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 24,
@@ -323,6 +347,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '기존의 틀을 벗어나 창의적으로 생각하는 것을 좋아한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { N: 1 },
+    polarity: 'N',
   },
 
   // ===== T-F 차원 (12문항) =====
@@ -333,6 +358,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '결정을 내릴 때 논리와 분석을 우선시한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { T: 1 },
+    polarity: 'T',
   },
   {
     id: 26,
@@ -341,6 +367,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '다른 사람의 감정을 먼저 고려하는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { F: 1 },
+    polarity: 'F',
   },
   {
     id: 27,
@@ -349,6 +376,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '공정하고 객관적인 것이 가장 중요하다고 생각한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { T: 1 },
+    polarity: 'T',
   },
   {
     id: 28,
@@ -357,6 +385,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '조화롭고 따뜻한 관계를 유지하는 것이 중요하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { F: 1 },
+    polarity: 'F',
   },
   {
     id: 29,
@@ -365,6 +394,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '비판적 피드백을 주는 것이 어렵지 않다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { T: 1 },
+    polarity: 'T',
   },
   {
     id: 30,
@@ -373,6 +403,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '다른 사람의 처지에서 생각해보려 노력한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { F: 1 },
+    polarity: 'F',
   },
   {
     id: 31,
@@ -381,6 +412,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '감정보다 사실에 기반하여 판단해야 한다고 본다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { T: 1 },
+    polarity: 'T',
   },
   {
     id: 32,
@@ -389,6 +421,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '누군가가 힘들어하면 정서적으로 공감하게 된다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { F: 1 },
+    polarity: 'F',
   },
   {
     id: 33,
@@ -397,6 +430,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '효율성과 성과가 가장 중요하다고 생각한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { T: 1 },
+    polarity: 'T',
   },
   {
     id: 34,
@@ -405,6 +439,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '갈등 상황에서 모두가 만족하는 해결책을 찾으려 한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { F: 1 },
+    polarity: 'F',
   },
   {
     id: 35,
@@ -413,6 +448,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '문제 상황에서 원인과 결과를 먼저 분석한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { T: 1 },
+    polarity: 'T',
   },
   {
     id: 36,
@@ -421,6 +457,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '사람들의 가치와 감정을 존중하는 것이 우선이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { F: 1 },
+    polarity: 'F',
   },
 
   // ===== J-P 차원 (12문항) =====
@@ -431,6 +468,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '계획을 세우고 그대로 실행하는 것을 좋아한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { J: 1 },
+    polarity: 'J',
   },
   {
     id: 38,
@@ -439,6 +477,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '상황에 따라 유연하게 대응하는 것이 편하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { P: 1 },
+    polarity: 'P',
   },
   {
     id: 39,
@@ -447,6 +486,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '마감 기한을 잘 지키는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { J: 1 },
+    polarity: 'J',
   },
   {
     id: 40,
@@ -455,6 +495,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '즉흥적으로 행동하는 것이 더 자연스럽다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { P: 1 },
+    polarity: 'P',
   },
   {
     id: 41,
@@ -463,6 +504,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '정리정돈이 잘 되어 있는 환경을 선호한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { J: 1 },
+    polarity: 'J',
   },
   {
     id: 42,
@@ -471,6 +513,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '여러 선택지를 열어두는 것이 좋다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { P: 1 },
+    polarity: 'P',
   },
   {
     id: 43,
@@ -479,6 +522,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '일을 미리미리 끝내는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { J: 1 },
+    polarity: 'J',
   },
   {
     id: 44,
@@ -487,6 +531,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '마감 직전에 집중력이 더 높아진다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { P: 1 },
+    polarity: 'P',
   },
   {
     id: 45,
@@ -495,6 +540,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '예측 가능한 일상이 편안하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { J: 1 },
+    polarity: 'J',
   },
   {
     id: 46,
@@ -503,6 +549,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '새로운 경험과 변화가 삶을 풍요롭게 한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { P: 1 },
+    polarity: 'P',
   },
   {
     id: 47,
@@ -511,6 +558,7 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '결정을 빨리 내리고 실행에 옮기는 것을 선호한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { J: 1 },
+    polarity: 'J',
   },
   {
     id: 48,
@@ -519,5 +567,6 @@ export const mbtiQuestions: TestQuestion[] = [
     questionText: '가능한 한 옵션을 열어두고 마지막 순간에 결정하는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { P: 1 },
+    polarity: 'P',
   },
 ];

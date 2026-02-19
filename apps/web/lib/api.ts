@@ -85,6 +85,25 @@ export const api = {
       request('/api/results/comprehensive', {
         headers: { Authorization: `Bearer ${token}` },
       }),
+    saveAnonymous: (data: {
+      session_id: string;
+      comprehensive_profile: any;
+      abilities_snapshot: any;
+      personal_info?: any;
+      answers?: any;
+    }) =>
+      request('/api/results/comprehensive/anonymous', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    claimAnonymous: (sessionId: string, token: string) =>
+      request('/api/results/comprehensive/claim', {
+        method: 'POST',
+        body: JSON.stringify({ session_id: sessionId }),
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    getCompletionCount: () =>
+      request<{ count: number }>('/api/results/comprehensive/count'),
   },
 
   // Abilities

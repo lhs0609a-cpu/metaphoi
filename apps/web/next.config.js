@@ -1,8 +1,13 @@
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Vercel 모노레포: Root Directory가 루트일 때 .next를 루트에 출력
   distDir: process.env.VERCEL ? '../../.next' : '.next',
   transpilePackages: ['shared'],
+  turbopack: {
+    root: __dirname,
+  },
   images: {
     domains: ['localhost'],
     remotePatterns: [

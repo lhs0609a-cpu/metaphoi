@@ -22,6 +22,7 @@ class SeekerProfileCreate(BaseModel):
     available_from: Optional[str] = None
     comprehensive_profile: Optional[dict] = None
     abilities_snapshot: Optional[list] = None
+    career_questionnaire: Optional[dict] = None
 
 
 class SeekerProfileUpdate(BaseModel):
@@ -37,6 +38,7 @@ class SeekerProfileUpdate(BaseModel):
     available_from: Optional[str] = None
     is_active: Optional[bool] = None
     visibility: Optional[str] = None
+    career_questionnaire: Optional[dict] = None
 
 
 @router.post("/profile")
@@ -72,6 +74,7 @@ async def create_seeker_profile(
         "available_from": data.available_from,
         "comprehensive_profile": data.comprehensive_profile,
         "abilities_snapshot": data.abilities_snapshot,
+        "career_questionnaire": data.career_questionnaire,
     }
 
     result = supabase.table("seeker_profiles").insert(insert_data).execute()

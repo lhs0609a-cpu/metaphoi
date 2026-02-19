@@ -79,6 +79,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 1, TE: 0.3, SY: 0.3, SE: -0.5 },
+    polarity: 'TY',
   },
   {
     id: 502,
@@ -90,6 +91,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 1, TE: 0, SY: 0.5, SE: -0.5 },
+    polarity: 'TY',
   },
   {
     id: 503,
@@ -101,6 +103,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 1, TE: -0.3, SY: 0.3, SE: 0 },
+    polarity: 'TY',
   },
   {
     id: 504,
@@ -112,6 +115,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 1, TE: -0.3, SY: 0.3, SE: -0.5 },
+    polarity: 'TY',
   },
   {
     id: 505,
@@ -123,6 +127,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 1, TE: 0, SY: 0.5, SE: -0.5 },
+    polarity: 'TY',
   },
 
   // ===== 태음인 (TE) 관련 문항 (5문항) =====
@@ -136,6 +141,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0.3, TE: 1, SY: -0.3, SE: -0.5 },
+    polarity: 'TE',
   },
   {
     id: 507,
@@ -147,6 +153,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0, TE: 1, SY: -0.5, SE: 0.3 },
+    polarity: 'TE',
   },
   {
     id: 508,
@@ -158,6 +165,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0, TE: 1, SY: 0, SE: -0.5 },
+    polarity: 'TE',
   },
   {
     id: 509,
@@ -169,6 +177,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0, TE: 1, SY: 0.3, SE: -0.5 },
+    polarity: 'TE',
   },
   {
     id: 510,
@@ -180,6 +189,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: -0.3, TE: 1, SY: -0.5, SE: 0.3 },
+    polarity: 'TE',
   },
 
   // ===== 소양인 (SY) 관련 문항 (5문항) =====
@@ -193,6 +203,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0.3, TE: -0.3, SY: 1, SE: -0.5 },
+    polarity: 'SY',
   },
   {
     id: 512,
@@ -204,6 +215,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0.5, TE: 0, SY: 1, SE: -0.3 },
+    polarity: 'SY',
   },
   {
     id: 513,
@@ -215,6 +227,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0.3, TE: 0.3, SY: 1, SE: -0.5 },
+    polarity: 'SY',
   },
   {
     id: 514,
@@ -226,6 +239,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0.5, TE: -0.3, SY: 1, SE: -0.5 },
+    polarity: 'SY',
   },
   {
     id: 515,
@@ -237,6 +251,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0.3, TE: 0, SY: 1, SE: -0.5 },
+    polarity: 'SY',
   },
 
   // ===== 소음인 (SE) 관련 문항 (5문항) =====
@@ -250,6 +265,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: -0.5, TE: -0.5, SY: -0.3, SE: 1 },
+    polarity: 'SE',
   },
   {
     id: 517,
@@ -261,6 +277,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: 0, TE: -0.3, SY: 0, SE: 1 },
+    polarity: 'SE',
   },
   {
     id: 518,
@@ -272,6 +289,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: -0.5, TE: 0, SY: -0.5, SE: 1 },
+    polarity: 'SE',
   },
   {
     id: 519,
@@ -283,6 +301,7 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: -0.3, TE: 0, SY: -0.3, SE: 1 },
+    polarity: 'SE',
   },
   {
     id: 520,
@@ -294,5 +313,6 @@ export const sasangQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { TY: -0.3, TE: 0, SY: 0, SE: 1 },
+    polarity: 'SE',
   },
 ];

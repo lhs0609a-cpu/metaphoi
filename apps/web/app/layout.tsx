@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const geistMono = Geist_Mono({ subsets: ['latin'], variable: '--font-mono-stat' });
 
 export const metadata: Metadata = {
   title: 'Metaphoi (메타포이) - 종합 인재 평가 플랫폼',
@@ -41,10 +42,17 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        {/* Pretendard 한글 산세리프 */}
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
         {/* 카카오톡 공유 SDK */}
         <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" async />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${geistMono.variable}`}>
         {children}
         <Toaster />
       </body>

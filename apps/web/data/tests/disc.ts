@@ -147,6 +147,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
   {
     id: 102,
@@ -158,6 +159,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
   {
     id: 103,
@@ -169,6 +171,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
   {
     id: 104,
@@ -180,6 +183,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
   {
     id: 105,
@@ -191,6 +195,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
   {
     id: 106,
@@ -202,6 +207,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
   {
     id: 107,
@@ -213,6 +219,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { D: 1 },
+    polarity: 'D',
   },
 
   // ===== I (사교형) 차원 (7문항) =====
@@ -226,6 +233,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 109,
@@ -237,6 +245,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 110,
@@ -248,6 +257,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 111,
@@ -259,6 +269,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 112,
@@ -270,6 +281,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 113,
@@ -281,6 +293,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 114,
@@ -292,6 +305,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
 
   // ===== S (안정형) 차원 (7문항) =====
@@ -305,6 +319,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 116,
@@ -316,6 +331,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 117,
@@ -327,6 +343,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 118,
@@ -338,6 +355,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 119,
@@ -349,6 +367,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 120,
@@ -360,6 +379,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 121,
@@ -371,6 +391,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
 
   // ===== C (신중형) 차원 (7문항) =====
@@ -384,6 +405,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 123,
@@ -395,6 +417,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 124,
@@ -406,6 +429,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 125,
@@ -417,6 +441,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 126,
@@ -428,6 +453,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 127,
@@ -439,6 +465,7 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 128,
@@ -450,5 +477,6 @@ export const discQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
 ];

@@ -81,6 +81,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '손으로 직접 물건을 만들거나 수리하는 작업이 즐겁다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
   {
     id: 302,
@@ -89,6 +90,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '기계나 도구를 다루는 일에 자신이 있다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
   {
     id: 303,
@@ -97,6 +99,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '야외에서 몸을 움직이며 일하는 것을 선호한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
   {
     id: 304,
@@ -105,6 +108,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '전자제품이나 컴퓨터를 분해하고 조립하는 것에 흥미가 있다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
   {
     id: 305,
@@ -113,6 +117,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '눈에 보이는 구체적인 결과물을 만들어내는 일이 보람차다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
   {
     id: 306,
@@ -121,6 +126,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '설계도나 도면을 보고 실제로 구현하는 작업이 재미있다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
   {
     id: 307,
@@ -129,6 +135,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '체력을 사용하는 활동적인 일이 책상에 앉아 하는 일보다 좋다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { R: 1 },
+    polarity: 'R',
   },
 
   // ===== I (탐구형) 7문항 =====
@@ -139,6 +146,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '복잡한 문제의 원인을 분석하고 해결책을 찾는 과정이 흥미롭다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 309,
@@ -147,6 +155,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '과학 실험이나 연구 활동에 참여하는 것이 즐겁다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 310,
@@ -155,6 +164,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '새로운 지식을 배우고 탐구하는 것에 시간을 투자하는 것이 아깝지 않다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 311,
@@ -163,6 +173,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '현상의 이면에 있는 원리나 법칙을 이해하고 싶은 욕구가 크다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 312,
@@ -171,6 +182,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '데이터를 수집하고 논리적으로 분석하는 작업을 잘 수행한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 313,
@@ -179,6 +191,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '혼자서 깊이 있게 사고하며 집중하는 시간이 필요하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
   {
     id: 314,
@@ -187,6 +200,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '어떤 현상이 왜 일어나는지 근본적인 이유를 끝까지 파고드는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { I: 1 },
+    polarity: 'I',
   },
 
   // ===== A (예술형) 7문항 =====
@@ -197,6 +211,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '그림, 음악, 글쓰기 등 창작 활동을 할 때 행복감을 느낀다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
   {
     id: 316,
@@ -205,6 +220,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '자유롭고 틀에 얽매이지 않는 환경에서 일하고 싶다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
   {
     id: 317,
@@ -213,6 +229,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '독창적인 아이디어를 떠올리고 이를 표현하는 것이 중요하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
   {
     id: 318,
@@ -221,6 +238,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '미적 감각이나 예술적 안목이 뛰어나다는 이야기를 듣는다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
   {
     id: 319,
@@ -229,6 +247,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '공연, 전시, 영화 등 문화예술 활동을 감상하는 것을 좋아한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
   {
     id: 320,
@@ -237,6 +256,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '정해진 규칙보다 나만의 방식으로 문제를 해결하는 것을 선호한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
   {
     id: 321,
@@ -245,6 +265,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '감정이나 생각을 예술적 매체를 통해 표현하는 데 관심이 많다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { A: 1 },
+    polarity: 'A',
   },
 
   // ===== S (사회형) 7문항 =====
@@ -255,6 +276,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '다른 사람들을 돕고 봉사하는 일에 보람을 느낀다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 323,
@@ -263,6 +285,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '사람들의 고민을 들어주고 상담하는 역할이 잘 맞는다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 324,
@@ -271,6 +294,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '팀원들과 협력하여 함께 목표를 달성하는 것이 즐겁다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 325,
@@ -279,6 +303,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '누군가에게 새로운 것을 가르쳐주는 것이 기쁘다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 326,
@@ -287,6 +312,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '주변 사람들의 감정을 잘 파악하고 공감하는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 327,
@@ -295,6 +321,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '사회적으로 의미 있는 일을 하며 세상에 기여하고 싶다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
   {
     id: 328,
@@ -303,6 +330,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '갈등 상황에서 중재자 역할을 자연스럽게 맡게 된다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { S: 1 },
+    polarity: 'S',
   },
 
   // ===== E (진취형) 7문항 =====
@@ -313,6 +341,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '프로젝트나 모임에서 리더 역할을 맡는 것이 자연스럽다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 330,
@@ -321,6 +350,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '다른 사람을 설득하여 내 의견에 동의하게 만드는 것에 자신이 있다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 331,
@@ -329,6 +359,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '새로운 사업이나 프로젝트를 기획하고 추진하는 것이 흥미롭다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 332,
@@ -337,6 +368,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '경쟁 상황에서 이기고 싶은 욕구가 강하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 333,
@@ -345,6 +377,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '큰 목표를 세우고 이를 달성하기 위해 전략을 세우는 것이 좋다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 334,
@@ -353,6 +386,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '위험을 감수하더라도 높은 보상을 추구하는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
   {
     id: 335,
@@ -361,6 +395,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '사람들 앞에서 발표하거나 의견을 주장하는 것이 두렵지 않다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { E: 1 },
+    polarity: 'E',
   },
 
   // ===== C (관습형) 7문항 =====
@@ -371,6 +406,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '정해진 절차와 규칙에 따라 체계적으로 일하는 것이 편하다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 337,
@@ -379,6 +415,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '숫자나 데이터를 꼼꼼하게 정리하고 관리하는 작업을 잘한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 338,
@@ -387,6 +424,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '서류나 문서를 정확하게 작성하고 관리하는 능력이 뛰어나다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 339,
@@ -395,6 +433,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '반복적이고 안정적인 업무가 불확실한 업무보다 좋다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 340,
@@ -403,6 +442,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '세부 사항을 빠뜨리지 않고 꼼꼼하게 확인하는 편이다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 341,
@@ -411,6 +451,7 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '일정이나 계획표를 작성하고 이에 맞춰 생활하는 것을 좋아한다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
   {
     id: 342,
@@ -419,5 +460,6 @@ export const hollandQuestions: TestQuestion[] = [
     questionText: '명확한 지시와 기준이 있는 환경에서 업무 효율이 높다.',
     options: { scale: [1, 2, 3, 4, 5], labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'] },
     scoringWeights: { C: 1 },
+    polarity: 'C',
   },
 ];

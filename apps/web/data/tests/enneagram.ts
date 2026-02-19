@@ -108,6 +108,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T1: 1 },
+    polarity: 'T1',
   },
   {
     id: 202,
@@ -119,6 +120,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T1: 1 },
+    polarity: 'T1',
   },
   {
     id: 203,
@@ -130,6 +132,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T1: 1 },
+    polarity: 'T1',
   },
   {
     id: 204,
@@ -141,6 +144,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T1: 1 },
+    polarity: 'T1',
   },
 
   // ===== 유형 2: 조력자 (4문항) =====
@@ -154,6 +158,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T2: 1 },
+    polarity: 'T2',
   },
   {
     id: 206,
@@ -165,6 +170,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T2: 1 },
+    polarity: 'T2',
   },
   {
     id: 207,
@@ -176,6 +182,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T2: 1 },
+    polarity: 'T2',
   },
   {
     id: 208,
@@ -187,6 +194,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T2: 1 },
+    polarity: 'T2',
   },
 
   // ===== 유형 3: 성취자 (4문항) =====
@@ -200,6 +208,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T3: 1 },
+    polarity: 'T3',
   },
   {
     id: 210,
@@ -211,6 +220,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T3: 1 },
+    polarity: 'T3',
   },
   {
     id: 211,
@@ -222,6 +232,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T3: 1 },
+    polarity: 'T3',
   },
   {
     id: 212,
@@ -233,6 +244,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T3: 1 },
+    polarity: 'T3',
   },
 
   // ===== 유형 4: 예술가 (4문항) =====
@@ -246,6 +258,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T4: 1 },
+    polarity: 'T4',
   },
   {
     id: 214,
@@ -257,6 +270,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T4: 1 },
+    polarity: 'T4',
   },
   {
     id: 215,
@@ -268,6 +282,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T4: 1 },
+    polarity: 'T4',
   },
   {
     id: 216,
@@ -279,6 +294,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T4: 1 },
+    polarity: 'T4',
   },
 
   // ===== 유형 5: 탐구자 (4문항) =====
@@ -292,6 +308,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T5: 1 },
+    polarity: 'T5',
   },
   {
     id: 218,
@@ -303,6 +320,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T5: 1 },
+    polarity: 'T5',
   },
   {
     id: 219,
@@ -314,6 +332,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T5: 1 },
+    polarity: 'T5',
   },
   {
     id: 220,
@@ -325,6 +344,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T5: 1 },
+    polarity: 'T5',
   },
 
   // ===== 유형 6: 충성가 (4문항) =====
@@ -338,6 +358,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T6: 1 },
+    polarity: 'T6',
   },
   {
     id: 222,
@@ -349,6 +370,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T6: 1 },
+    polarity: 'T6',
   },
   {
     id: 223,
@@ -360,6 +382,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T6: 1 },
+    polarity: 'T6',
   },
   {
     id: 224,
@@ -371,6 +394,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T6: 1 },
+    polarity: 'T6',
   },
 
   // ===== 유형 7: 낙천가 (4문항) =====
@@ -384,6 +408,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T7: 1 },
+    polarity: 'T7',
   },
   {
     id: 226,
@@ -395,6 +420,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T7: 1 },
+    polarity: 'T7',
   },
   {
     id: 227,
@@ -406,6 +432,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T7: 1 },
+    polarity: 'T7',
   },
   {
     id: 228,
@@ -417,6 +444,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T7: 1 },
+    polarity: 'T7',
   },
 
   // ===== 유형 8: 도전자 (4문항) =====
@@ -430,6 +458,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T8: 1 },
+    polarity: 'T8',
   },
   {
     id: 230,
@@ -441,6 +470,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T8: 1 },
+    polarity: 'T8',
   },
   {
     id: 231,
@@ -452,6 +482,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T8: 1 },
+    polarity: 'T8',
   },
   {
     id: 232,
@@ -463,6 +494,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T8: 1 },
+    polarity: 'T8',
   },
 
   // ===== 유형 9: 중재자 (4문항) =====
@@ -476,6 +508,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T9: 1 },
+    polarity: 'T9',
   },
   {
     id: 234,
@@ -487,6 +520,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T9: 1 },
+    polarity: 'T9',
   },
   {
     id: 235,
@@ -498,6 +532,7 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T9: 1 },
+    polarity: 'T9',
   },
   {
     id: 236,
@@ -509,5 +544,6 @@ export const enneagramQuestions: TestQuestion[] = [
       labels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
     },
     scoringWeights: { T9: 1 },
+    polarity: 'T9',
   },
 ];

@@ -3,6 +3,7 @@ import { type ComprehensiveProfile } from '@/data/tests/comprehensive';
 
 const STORAGE_KEY = 'metaphoi_test_sessions';
 const COMPREHENSIVE_KEY = 'metaphoi_comprehensive';
+const ANON_SESSION_KEY = 'metaphoi_anon_session_id';
 
 export interface LocalTestSession {
   testCode: string;
@@ -149,4 +150,26 @@ export function hasCompletedComprehensive(): boolean {
 export function clearComprehensive() {
   if (typeof window === 'undefined') return;
   localStorage.removeItem(COMPREHENSIVE_KEY);
+}
+
+// === 익명 세션 ID 관리 ===
+
+export function getOrCreateAnonSessionId(): string {
+  if (typeof window === 'undefined') return '';
+  let id = localStorage.getItem(ANON_SESSION_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(ANON_SESSION_KEY, id);
+  }
+  return id;
+}
+
+export function getAnonSessionId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(ANON_SESSION_KEY);
+}
+
+export function clearAnonSessionId(): void {
+  if (typeof window === 'undefined') return;
+  localStorage.removeItem(ANON_SESSION_KEY);
 }

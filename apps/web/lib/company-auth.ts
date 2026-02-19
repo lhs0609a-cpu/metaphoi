@@ -16,6 +16,7 @@ interface CompanyAuthState {
   member: CompanyMember | null;
   token: string | null;
   isLoading: boolean;
+  isAuthenticated: boolean;
   setMember: (member: CompanyMember | null) => void;
   setToken: (token: string | null) => void;
   register: (data: {
@@ -39,9 +40,10 @@ export const useCompanyAuthStore = create<CompanyAuthState>()(
       member: null,
       token: null,
       isLoading: false,
+      isAuthenticated: false,
 
-      setMember: (member) => set({ member }),
-      setToken: (token) => set({ token }),
+      setMember: (member) => set({ member, isAuthenticated: !!member && !!get().token }),
+      setToken: (token) => set({ token, isAuthenticated: !!token && !!get().member }),
 
       register: async (data) => {
         set({ isLoading: true });
@@ -58,7 +60,7 @@ export const useCompanyAuthStore = create<CompanyAuthState>()(
           }
 
           const result = await response.json();
-          set({ token: result.access_token });
+          set({ token: result.access_token, isAuthenticated: false });
           await get().fetchMember();
           return { success: true };
         } catch (error) {
@@ -83,7 +85,7 @@ export const useCompanyAuthStore = create<CompanyAuthState>()(
           }
 
           const result = await response.json();
-          set({ token: result.access_token });
+          set({ token: result.access_token, isAuthenticated: false });
           await get().fetchMember();
           return { success: true };
         } catch (error) {
@@ -94,7 +96,7 @@ export const useCompanyAuthStore = create<CompanyAuthState>()(
       },
 
       logout: () => {
-        set({ member: null, token: null });
+        set({ member: null, token: null, isAuthenticated: false });
       },
 
       fetchMember: async () => {
@@ -108,12 +110,12 @@ export const useCompanyAuthStore = create<CompanyAuthState>()(
 
           if (response.ok) {
             const member = await response.json();
-            set({ member });
+            set({ member, isAuthenticated: !!get().token && !!member });
           } else {
-            set({ member: null, token: null });
+            set({ member: null, token: null, isAuthenticated: false });
           }
         } catch {
-          set({ member: null, token: null });
+          set({ member: null, token: null, isAuthenticated: false });
         }
       },
     }),

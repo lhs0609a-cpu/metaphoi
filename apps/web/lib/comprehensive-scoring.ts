@@ -1,11 +1,15 @@
 import { scoreTest, type TestResult } from './test-engine';
 import {
   FULL_QUESTION_SETS,
+  comprehensiveQuestions,
   type PersonalInfo,
   type ComprehensiveProfile,
   type RawTestScores,
+  type ReliabilityInfo,
 } from '@/data/tests/comprehensive';
 import { computeAbilities } from './abilities-scoring';
+import { validateResponses } from './response-validation';
+import { crossValidate } from './cross-validation';
 import { BLOOD_TYPE_DESCRIPTIONS } from '@/data/tests/blood';
 import {
   getYearGanji,
@@ -26,7 +30,7 @@ function scoreSajuFromInfo(info: PersonalInfo) {
 
   let hourGanji: { cheongan: string; jiji: string } | undefined;
   if (info.birthHourIdx > 0) {
-    const dayCgIdx = CHEONGAN.indexOf(dayGanji.cheongan);
+    const dayCgIdx = (CHEONGAN as readonly string[]).indexOf(dayGanji.cheongan);
     hourGanji = getHourGanji(dayCgIdx, info.birthHourIdx - 1);
   }
 
@@ -84,14 +88,31 @@ function generateSummary(
     ...(disc.strengths || []),
     ...(enneagram.strengths || []),
   ];
-  const strengths = [...new Set(allStrengths)].slice(0, 8);
+  const strengths = Array.from(new Set(allStrengths)).slice(0, 8);
 
   // 직업 추천 (Holland + Saju)
   const hollandCareers = holland.careers || [];
   const sajuCareers = SAJU_TYPE_DESCRIPTIONS[sajuDominant]?.career || [];
-  const careers = [...new Set([...hollandCareers, ...sajuCareers])].slice(0, 6);
+  const careers = Array.from(new Set([...hollandCareers, ...sajuCareers])).slice(0, 6);
 
   return { headline, personality, strengths, careers };
+}
+
+// 채점 실패 시 안전한 기본 결과
+const EMPTY_RESULT: TestResult = {
+  testCode: 'unknown',
+  resultType: 'Unknown',
+  rawScores: {},
+  interpretation: { type: 'Unknown', typeName: '미분석', description: '', strengths: [], weaknesses: [] },
+};
+
+function safeScore(testCode: string, questions: readonly any[], answers: Record<number, number | string>): TestResult {
+  const result = scoreTest(testCode, questions as any, answers);
+  if (!result) {
+    console.warn(`scoreTest('${testCode}') returned null — using fallback`);
+    return { ...EMPTY_RESULT, testCode };
+  }
+  return result;
 }
 
 // 종합 채점 메인 함수
@@ -100,11 +121,11 @@ export function scoreComprehensive(
   answers: Record<number, number | string>,
 ): ComprehensiveProfile {
   // 1) 각 검사별 채점 (전체 문항 배열 전달, 답변은 부분집합)
-  const mbtiResult = scoreTest('mbti', FULL_QUESTION_SETS.mbti, answers)!;
-  const discResult = scoreTest('disc', FULL_QUESTION_SETS.disc, answers)!;
-  const enneagramResult = scoreTest('enneagram', FULL_QUESTION_SETS.enneagram, answers)!;
-  const hollandResult = scoreTest('holland', FULL_QUESTION_SETS.holland, answers)!;
-  const sasangResult = scoreTest('sasang', FULL_QUESTION_SETS.sasang, answers)!;
+  const mbtiResult = safeScore('mbti', FULL_QUESTION_SETS.mbti, answers);
+  const discResult = safeScore('disc', FULL_QUESTION_SETS.disc, answers);
+  const enneagramResult = safeScore('enneagram', FULL_QUESTION_SETS.enneagram, answers);
+  const hollandResult = safeScore('holland', FULL_QUESTION_SETS.holland, answers);
+  const sasangResult = safeScore('sasang', FULL_QUESTION_SETS.sasang, answers);
 
   // 2) 사주 채점 (개인정보에서)
   const sajuData = scoreSajuFromInfo(personalInfo);
@@ -158,13 +179,30 @@ export function scoreComprehensive(
     saju: sajuData.ohaengScores,
   };
 
-  // 6) 30가지 능력치 산출
-  const abilities = computeAbilities(rawScores);
+  // 6) 응답 일관성 검증
+  const responseValidation = validateResponses(answers, comprehensiveQuestions);
 
-  // 7) 종합 요약 생성
+  // 7) 교차 검증
+  const crossValidation = crossValidate(rawScores);
+
+  // 8) 30가지 능력치 산출 (교차 검증 반영)
+  const abilities = computeAbilities(rawScores, crossValidation);
+
+  // 9) 종합 요약 생성
   const summary = generateSummary(
     mbtiResult, discResult, enneagramResult, hollandResult, sajuData.dominant,
   );
+
+  // 10) 신뢰도 정보 통합
+  const reliability: ReliabilityInfo = {
+    overallReliability: responseValidation.overallReliability,
+    consistencyScore: crossValidation.consistencyScore,
+    flags: [
+      ...responseValidation.flags,
+      ...crossValidation.conflicts.map((c) => `${c.rule}: ${c.expected} (실제: ${c.actual})`),
+    ],
+    testReliability: responseValidation.testReliability,
+  };
 
   return {
     personalInfo,
@@ -213,5 +251,6 @@ export function scoreComprehensive(
       description: bloodInfo.description,
     },
     summary,
+    reliability,
   };
 }

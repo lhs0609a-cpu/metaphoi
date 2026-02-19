@@ -13,6 +13,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isLoading: boolean;
+  isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
   setLoading: (loading: boolean) => void;
@@ -29,9 +30,10 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isLoading: false,
+      isAuthenticated: false,
 
-      setUser: (user) => set({ user }),
-      setToken: (token) => set({ token }),
+      setUser: (user) => set({ user, isAuthenticated: !!user && !!get().token }),
+      setToken: (token) => set({ token, isAuthenticated: !!token && !!get().user }),
       setLoading: (isLoading) => set({ isLoading }),
 
       login: async (email, password) => {
@@ -59,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const data = await response.json();
-          set({ token: data.access_token });
+          set({ token: data.access_token, isAuthenticated: false });
 
           // Fetch user info
           await get().fetchUser();
@@ -85,7 +87,7 @@ export const useAuthStore = create<AuthState>()(
           }
 
           if (response.data) {
-            set({ token: (response.data as any).access_token });
+            set({ token: (response.data as any).access_token, isAuthenticated: false });
             await get().fetchUser();
 
             // 검사 결과 자동 동기화
@@ -101,7 +103,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
-        set({ user: null, token: null });
+        set({ user: null, token: null, isAuthenticated: false });
       },
 
       fetchUser: async () => {
@@ -120,12 +122,12 @@ export const useAuthStore = create<AuthState>()(
 
           if (response.ok) {
             const user = await response.json();
-            set({ user });
+            set({ user, isAuthenticated: !!get().token && !!user });
           } else {
-            set({ user: null, token: null });
+            set({ user: null, token: null, isAuthenticated: false });
           }
         } catch (error) {
-          set({ user: null, token: null });
+          set({ user: null, token: null, isAuthenticated: false });
         }
       },
 
@@ -134,6 +136,18 @@ export const useAuthStore = create<AuthState>()(
         if (!token || typeof window === 'undefined') return;
 
         try {
+          // 익명 세션이 있으면 claim 시도
+          const anonSessionId = localStorage.getItem('metaphoi_anon_session_id');
+          if (anonSessionId) {
+            const claimRes = await api.results.claimAnonymous(anonSessionId, token);
+            localStorage.removeItem('metaphoi_anon_session_id');
+            if (claimRes.data) {
+              console.log('Anonymous results claimed to account');
+              return; // claim 성공 시 이미 서버에 결과가 있으므로 중복 저장 스킵
+            }
+          }
+
+          // claim 실패 또는 익명 세션 없음 → localStorage → 서버 동기화 (fallback)
           const raw = localStorage.getItem('metaphoi_comprehensive');
           if (!raw) return;
 

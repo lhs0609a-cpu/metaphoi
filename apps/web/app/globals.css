@@ -24,6 +24,20 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 262 83% 58%;
     --radius: 0.5rem;
+
+    /* Ability category colors */
+    --cat-mental: 234 89% 63%;
+    --cat-social: 160 84% 39%;
+    --cat-work: 38 92% 50%;
+    --cat-physical: 350 89% 60%;
+    --cat-potential: 263 70% 58%;
+
+    /* Rank badge colors */
+    --rank-s: 38 92% 50%;
+    --rank-a: 263 70% 58%;
+    --rank-b: 217 91% 60%;
+    --rank-c: 160 84% 39%;
+    --rank-d: 215 16% 47%;
   }
 
   .dark {
@@ -46,6 +60,20 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 262 83% 58%;
+
+    /* Ability category colors (dark) */
+    --cat-mental: 234 89% 63%;
+    --cat-social: 160 84% 39%;
+    --cat-work: 38 92% 50%;
+    --cat-physical: 350 89% 60%;
+    --cat-potential: 263 70% 58%;
+
+    /* Rank badge colors (dark) */
+    --rank-s: 38 92% 50%;
+    --rank-a: 263 70% 58%;
+    --rank-b: 217 91% 60%;
+    --rank-c: 160 84% 39%;
+    --rank-d: 215 16% 47%;
   }
 }
 
