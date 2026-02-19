@@ -50,7 +50,7 @@ export function RadarChart({
   showLabels = true,
   grayscale = false,
 }: RadarChartProps) {
-  const [ref, isInView] = useInView<HTMLDivElement>({ threshold: 0.3 });
+  const [ref, isInView] = useInView({ threshold: 0.3 });
   const sides = categories.length;
   const cx = size / 2;
   const cy = size / 2;

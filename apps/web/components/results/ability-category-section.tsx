@@ -18,7 +18,7 @@ export function AbilityCategorySection({
   isPaid,
   animate = true,
 }: AbilityCategorySectionProps) {
-  const [ref, isInView] = useInView<HTMLDivElement>({ threshold: 0.1 });
+  const [ref, isInView] = useInView({ threshold: 0.1 });
   const catColor = getCategoryColor(category);
 
   // Category average score

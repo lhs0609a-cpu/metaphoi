@@ -25,7 +25,7 @@ export function StatBar({
   animated = true,
   delay = 0,
 }: StatBarProps) {
-  const [ref, isInView] = useInView<HTMLDivElement>({ threshold: 0.2 });
+  const [ref, isInView] = useInView({ threshold: 0.2 });
   const pct = maxScore > 0 ? (score / maxScore) * 100 : 0;
   const displayValue = useCountUp(score, 800, animated ? isInView : true);
 
