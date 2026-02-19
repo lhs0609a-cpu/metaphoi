@@ -285,10 +285,10 @@ export function ComprehensiveTestContainer() {
           </div>
 
           {/* XP Progress Bar */}
-          <div className="w-full h-4 bg-muted rounded-full overflow-hidden animate-xp-pulse">
+          <div className="w-full h-5 bg-muted border border-border rounded-full overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 bg-gradient-to-r ${gradientClass}`}
-              style={{ width: `${progress}%` }}
+              className={`h-full min-w-[8px] rounded-full transition-all duration-500 bg-gradient-to-r ${gradientClass} animate-xp-pulse`}
+              style={{ width: `${Math.max(progress, 2)}%` }}
             />
           </div>
           <div className="flex items-center justify-between mt-1">
