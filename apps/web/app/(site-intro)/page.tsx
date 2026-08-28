@@ -1,293 +1,236 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { DemoRadarChart } from './demo-radar-chart';
-import { DemoStatGrid } from './demo-stat-grid';
+import { StatPreview } from './stat-preview';
 
 export const metadata = {
-  title: 'Metaphoi - 7가지 심리검사로 나를 발견하다',
-  description: '브랜드 스토리: 성격, 행동, 동기, 적성, 체질, 운명, 기질 — 7가지 관점을 하나로 융합한 종합 심리검사 서비스입니다.',
+  title: '성격검사 7개를 겹쳐 능력치 30개로',
+  description:
+    'MBTI, DISC, 에니어그램, Holland, 사주, 사상체질, 혈액형. 서로 다른 7가지 관점을 한 사람 위에 겹치면 취향이 아니라 수치가 남습니다. 53문항, 약 12분, 회원가입 없이.',
 };
 
-const TEST_PERSPECTIVES = [
-  {
-    name: '성격 유형',
-    desc: '16가지 성격 패턴 분석',
-    color: 'violet',
-    borderClass: 'border-t-violet-500',
-    iconBg: 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-      </svg>
-    ),
-  },
-  {
-    name: '행동 패턴',
-    desc: '상황별 행동 스타일',
-    color: 'blue',
-    borderClass: 'border-t-blue-500',
-    iconBg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-      </svg>
-    ),
-  },
-  {
-    name: '내면 동기',
-    desc: '9가지 핵심 동기',
-    color: 'amber',
-    borderClass: 'border-t-amber-500',
-    iconBg: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-      </svg>
-    ),
-  },
-  {
-    name: '직업 적성',
-    desc: '6가지 직업 흥미 유형',
-    color: 'green',
-    borderClass: 'border-t-green-500',
-    iconBg: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-      </svg>
-    ),
-  },
-  {
-    name: '체질 분석',
-    desc: '4가지 체질 유형',
-    color: 'rose',
-    borderClass: 'border-t-rose-500',
-    iconBg: 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-      </svg>
-    ),
-  },
-  {
-    name: '운명 분석',
-    desc: '생년월일시 기반 기질',
-    color: 'indigo',
-    borderClass: 'border-t-indigo-500',
-    iconBg: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-      </svg>
-    ),
-  },
-  {
-    name: '기질 유형',
-    desc: '혈액형 기질 패턴',
-    color: 'pink',
-    borderClass: 'border-t-pink-500',
-    iconBg: 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3c-1.2 2.4-5 6.6-5 10a5 5 0 0010 0c0-3.4-3.8-7.6-5-10z" />
-      </svg>
-    ),
-  },
-  {
-    name: '30가지 스탯',
-    desc: '모든 분석을 하나로',
-    highlight: true,
-    borderClass: 'border-t-primary',
-    iconBg: 'bg-primary/10 text-primary',
-    icon: (
-      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-      </svg>
-    ),
-  },
+/* 검사 7종. 색을 주지 않는다 — 일곱 개를 일곱 색으로 칠하면
+   무엇이 중요한지가 아니라 색이 몇 개인지만 보인다. */
+const PERSPECTIVES = [
+  { no: '01', name: 'MBTI', what: '성격 유형', detail: '정보를 받아들이고 결정하는 방식' },
+  { no: '02', name: 'DISC', what: '행동 패턴', detail: '압박이 있을 때 나오는 반응' },
+  { no: '03', name: '에니어그램', what: '내면 동기', detail: '움직이게 만드는 두려움과 욕구' },
+  { no: '04', name: 'Holland', what: '직업 적성', detail: '오래 붙잡고 있어도 지치지 않는 일' },
+  { no: '05', name: '사주', what: '기질', detail: '타고난 기운의 균형' },
+  { no: '06', name: '사상체질', what: '체질', detail: '몸이 감당하는 방식' },
+  { no: '07', name: '혈액형', what: '기질 보정', detail: '보조 지표로만 사용' },
 ];
 
-export default function HomePage() {
+const CATEGORIES = [
+  { name: '정신력', token: 'cat-mental', items: '결단력 · 침착성 · 집중력 · 창의성 · 분석력 · 적응력' },
+  { name: '사회성', token: 'cat-social', items: '소통능력 · 협동심 · 리더십 · 공감능력 · 영향력 · 네트워킹' },
+  { name: '업무역량', token: 'cat-work', items: '실행력 · 기획력 · 문제해결 · 시간관리 · 꼼꼼함 · 멀티태스킹' },
+  { name: '신체/감각', token: 'cat-physical', items: '스트레스내성 · 지구력 · 직관력 · 심미안 · 공간지각 · 언어능력' },
+  { name: '잠재력', token: 'cat-potential', items: '성장가능성 · 학습속도 · 혁신성 · 회복탄력성 · 야망 · 성실성' },
+];
+
+export default function IntroPage() {
   return (
     <>
-      {/* Hero with Radar Chart */}
-      <section className="container mx-auto px-4 pt-24 pb-20 text-center">
-        <span className="inline-block text-sm font-medium text-primary bg-primary/10 px-4 py-1.5 rounded-full mb-6">
-          회원가입 없이 무료 시작
-        </span>
-        <h1 className="text-4xl font-bold tracking-tight sm:text-6xl mb-6 leading-tight">
-          나를 가장 정확하게
-          <br />
-          <span className="text-primary">파악하는 방법</span>
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
-          성격, 행동, 동기, 적성, 체질, 운명, 기질
-          <br className="hidden sm:block" />
-          <strong className="text-foreground">7가지 관점을 하나로 융합한 종합 분석.</strong> 약 50문항으로 당신을 입체적으로 파악합니다.
-        </p>
+      {/* ================================================================
+          히어로 — 가운데 정렬하지 않는다.
+          왼쪽에 말, 오른쪽에 결과물. 무엇을 받게 되는지 첫 화면에서 보인다.
+          ================================================================ */}
+      <section className="shell grid items-center gap-12 py-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:py-24">
+        <div className="anim-rise flex flex-col items-start">
+          <p className="eyebrow">무료 · 회원가입 없이 · 약 12분</p>
 
-        {/* Demo Radar Chart */}
-        <div className="my-8">
-          <DemoRadarChart />
-        </div>
+          <h1 className="mt-4 text-display">
+            성격검사 7개를 겹쳐
+            <br />
+            <span className="text-primary">능력치 30개</span>로
+          </h1>
 
-        <p className="text-sm text-muted-foreground mb-6">
-          약 10~15분 소요 | 로그인 불필요 | 결과 즉시 확인
-        </p>
-        <Link href="/start">
-          <Button size="lg" className="text-lg px-10 py-7 shadow-lg hover:shadow-xl transition-shadow relative overflow-hidden">
-            <span className="relative z-10">캐릭터 분석 시작하기</span>
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer bg-[length:200%_100%]" />
-          </Button>
-        </Link>
-      </section>
+          <p className="mt-6 max-w-[34ch] text-lead text-muted-foreground">
+            검사 하나로는 사람이 설명되지 않습니다. 서로 다른 7가지 관점을 한 사람 위에 겹치면,
+            취향이 아니라 수치가 남습니다.
+          </p>
 
-      {/* 7 Perspectives Grid */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-4">7가지 관점, 하나의 분석</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">
-          서양 심리학과 동양 지혜를 융합한 독자적 분석 프레임워크입니다
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {TEST_PERSPECTIVES.map((item) => (
-            <Card
-              key={item.name}
-              className={`text-center border-t-2 ${item.borderClass} ${item.highlight ? 'border-primary bg-primary/5' : ''}`}
-            >
-              <CardContent className="pt-6 pb-4">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 ${item.iconBg}`}>
-                  {item.icon}
-                </div>
-                <h3 className="font-bold text-sm">{item.name}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        <p className="text-center text-xs text-muted-foreground mt-8 max-w-lg mx-auto">
-          * 국제적으로 검증된 심리학 이론과 전통 분석법을 기반으로 자체 개발된 문항을 사용합니다
-        </p>
-      </section>
-
-      {/* Why Combined */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">왜 종합 분석인가</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {[
-            {
-              icon: (
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              ),
-              title: '한 가지 관점만으로는 부족합니다',
-              description: '하나의 검사로 사람을 판단할 수 없습니다. 7가지 관점에서 교차 분석하여 정말 나다운 모습을 찾아드립니다.',
-            },
-            {
-              icon: (
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-                </svg>
-              ),
-              title: 'RPG처럼 보는 내 능력치',
-              description: '검사 결과를 30개 능력치로 수치화합니다. 결단력, 창의성, 소통능력 등 나의 스탯을 한눈에 확인하세요.',
-            },
-            {
-              icon: (
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              ),
-              title: '동양 + 서양 통합',
-              description: '서양 심리학 이론과 동양 지혜를 결합한 세계 유일의 종합 분석 서비스입니다.',
-            },
-          ].map((item) => (
-            <Card key={item.title} className="text-center">
-              <CardContent className="pt-8 pb-6">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4 text-primary">
-                  {item.icon}
-                </div>
-                <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* 30 Stats Demo Grid */}
-      <section className="container mx-auto px-4 py-16 bg-card rounded-2xl">
-        <h2 className="text-3xl font-bold text-center mb-4">30가지 능력치</h2>
-        <p className="text-center text-muted-foreground mb-12 max-w-xl mx-auto">
-          검사 결과를 기반으로 당신만의 캐릭터 스탯을 산출합니다
-        </p>
-        <DemoStatGrid />
-        <div className="text-center mt-10">
-          <Link href="/start">
-            <Button variant="outline" size="lg">
-              나의 능력치 확인하기
+          <div className="mt-9 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <Button asChild size="lg">
+              <Link href="/start">무료로 검사 시작하기</Link>
             </Button>
-          </Link>
+            <Button asChild size="lg" variant="ghost">
+              <Link href="/jobs">채용 플랫폼 둘러보기</Link>
+            </Button>
+          </div>
+
+          <p className="mt-5 text-small text-muted-foreground">
+            53문항 · 결과 즉시 확인 · 이메일 없이 시작
+          </p>
+        </div>
+
+        <div className="anim-rise flex w-full lg:justify-end">
+          <StatPreview />
         </div>
       </section>
 
-      {/* Target Audience */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">이런 분들에게 추천합니다</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          {[
-            { title: '취업 준비생', description: '나에게 맞는 직업과 직무가 뭔지 알고 싶다면', cta: '적성 찾기' },
-            { title: '자기 이해가 필요한 분', description: '진짜 나는 누구인지, 내면을 깊이 들여다보고 싶다면', cta: '나를 알기' },
-            { title: '팀 리더 & HR', description: '팀원의 성향을 파악하고 조직 소통을 개선하고 싶다면', cta: '팀 분석' },
-          ].map((item) => (
-            <Card key={item.title} className="border-primary/20 hover:border-primary/50 transition-colors">
-              <CardContent className="pt-6 pb-4">
-                <h3 className="font-bold mb-1">{item.title}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
-                <Link href="/start">
-                  <Button variant="outline" size="sm">{item.cta}</Button>
-                </Link>
-              </CardContent>
-            </Card>
-          ))}
+      <div className="shell">
+        <div className="rule" />
+      </div>
+
+      {/* ================================================================
+          검사 7종 — 카드가 아니라 목록.
+          일곱 개를 나열하는 데 카드 일곱 장은 과하다.
+          ================================================================ */}
+      <section className="shell py-16 lg:py-24">
+        <div className="grid gap-10 lg:grid-cols-[22rem_1fr] lg:gap-16">
+          <div>
+            <p className="eyebrow">무엇을 재는가</p>
+            <h2 className="mt-3 text-h2">일곱 개의 서로 다른 질문</h2>
+            <p className="mt-4 max-w-[36ch] text-body text-muted-foreground">
+              같은 사람을 일곱 번 다르게 묻습니다. 답이 겹치는 곳이 그 사람의 단단한 부분이고,
+              어긋나는 곳이 상황을 타는 부분입니다.
+            </p>
+          </div>
+
+          <ul className="flex flex-col">
+            {PERSPECTIVES.map((p) => (
+              <li
+                key={p.no}
+                className="flex items-baseline gap-4 border-t border-border py-5 last:border-b sm:gap-6"
+              >
+                <span className="stat-num w-7 shrink-0 text-small text-muted-foreground">{p.no}</span>
+                <div className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-6">
+                  <span className="w-28 shrink-0 text-body font-semibold">{p.name}</span>
+                  <span className="w-20 shrink-0 text-small text-muted-foreground">{p.what}</span>
+                  <span className="text-small text-muted-foreground">{p.detail}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      {/* Process Steps */}
-      <section className="container mx-auto px-4 py-16">
-        <h2 className="text-3xl font-bold text-center mb-12">검사는 이렇게 진행됩니다</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
-          {[
-            { step: '1', title: '기본 정보 입력', description: '이름, 생년월일, 혈액형 등 기본 정보를 입력합니다' },
-            { step: '2', title: '약 50개 질문 응답', description: '직관적으로 느끼는 대로 답변하세요. 정답은 없습니다' },
-            { step: '3', title: '7가지 분석', description: '성격, 행동, 적성, 체질, 사주까지 종합 분석됩니다' },
-            { step: '4', title: '결과 확인', description: '나만의 유형과 능력치를 바로 확인하세요' },
-          ].map((item) => (
-            <div key={item.step} className="text-center">
-              <div className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-mono-stat font-bold">
-                {item.step}
+      {/* ================================================================
+          결과 — 여기서만 색을 쓴다. 다섯 축에 다섯 색.
+          ================================================================ */}
+      <section className="bg-sunk py-16 lg:py-24">
+        <div className="shell">
+          <p className="eyebrow">무엇이 남는가</p>
+          <h2 className="mt-3 max-w-[20ch] text-h2">
+            문항 53개가 능력치 30개로 정리됩니다
+          </h2>
+
+          <div className="mt-12 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+            {CATEGORIES.map((c) => (
+              <div key={c.name} className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: `hsl(var(--${c.token}))` }}
+                    aria-hidden="true"
+                  />
+                  <h3 className="text-h4">{c.name}</h3>
+                  <span className="stat-num text-small text-muted-foreground">6</span>
+                </div>
+                <p className="text-small leading-relaxed text-muted-foreground">{c.items}</p>
               </div>
-              <h3 className="font-bold mb-2">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.description}</p>
+            ))}
+
+            <div className="flex flex-col justify-center gap-3 rounded-card border border-border bg-card p-6">
+              <p className="text-small text-muted-foreground">내 능력치는 어떻게 나올까</p>
+              <Button asChild block>
+                <Link href="/start">검사하고 확인하기</Link>
+              </Button>
             </div>
-          ))}
+          </div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <h2 className="text-3xl font-bold mb-4">나를 가장 정확하게 아는 것, 여기서 시작됩니다</h2>
-        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          약 50개 질문, 10~15분이면 7가지 관점에서 나를 입체적으로 분석할 수 있습니다.
-        </p>
-        <Link href="/start">
-          <Button size="lg" className="text-lg px-10 py-7 shadow-lg hover:shadow-xl transition-shadow relative overflow-hidden">
-            <span className="relative z-10">캐릭터 분석 시작하기</span>
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer bg-[length:200%_100%]" />
+      {/* ================================================================
+          정직성 — 이 제품의 진짜 차별점.
+          대부분의 성격검사가 하지 않는 말을 여기서 한다.
+          ================================================================ */}
+      <section className="shell py-16 lg:py-24">
+        <div className="grid gap-10 lg:grid-cols-[22rem_1fr] lg:gap-16">
+          <div>
+            <p className="eyebrow">우리가 말하지 않는 것</p>
+            <h2 className="mt-3 text-h2">
+              맞히는 척하지
+              <br />
+              않습니다
+            </h2>
+          </div>
+
+          <dl className="flex flex-col">
+            {[
+              {
+                q: '이 점수는 백분위가 아닙니다',
+                a: '규준 표본이 쌓이기 전까지는 모집단 대비 순위를 낼 수 없습니다. 지금 보이는 숫자는 당신 안에서의 상대적 크기이며, 화면에 그렇게 표시합니다.',
+              },
+              {
+                q: '사주와 혈액형은 보조 지표입니다',
+                a: '검증된 심리 측정과 전통 분석법은 근거의 무게가 다릅니다. 같은 비중으로 섞지 않고, 어떤 문항이 어디에 얼마나 반영됐는지 결과에서 열어 둡니다.',
+              },
+              {
+                q: '적합도만으로 사람을 거르지 마세요',
+                a: '기업 화면의 매칭 점수는 정렬을 돕는 참고 지표입니다. 가중치는 아직 준거 타당도가 검증되지 않은 설정값이라고 채용 담당자 화면에도 그대로 적어 둡니다.',
+              },
+            ].map((item) => (
+              <div key={item.q} className="border-t border-border py-6 last:border-b">
+                <dt className="text-h4">{item.q}</dt>
+                <dd className="mt-2 max-w-[60ch] text-body text-muted-foreground">{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      {/* ================================================================
+          두 갈래 — 개인과 기업
+          ================================================================ */}
+      <section className="shell pb-16 lg:pb-24">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="flex flex-col gap-3 rounded-card border border-border p-8">
+            <p className="eyebrow">개인</p>
+            <h3 className="text-h3">나를 숫자로 봅니다</h3>
+            <p className="flex-1 text-body text-muted-foreground">
+              검사하고 결과를 받고, 원하면 프로필을 공개해 기업의 제안을 받습니다.
+              공개 범위는 언제든 되돌릴 수 있습니다.
+            </p>
+            <div className="mt-3">
+              <Button asChild variant="outline">
+                <Link href="/start">검사 시작하기</Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 rounded-card border border-border p-8">
+            <p className="eyebrow">기업</p>
+            <h3 className="text-h3">능력치로 후보를 찾습니다</h3>
+            <p className="flex-1 text-body text-muted-foreground">
+              공고에 요구 능력치를 설정하면 적합도 순으로 후보가 정렬됩니다.
+              팀 성향을 등록하면 컬처핏까지 계산합니다.
+            </p>
+            <div className="mt-3">
+              <Button asChild variant="outline">
+                <Link href="/enterprise">기업 서비스 보기</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================
+          마무리
+          ================================================================ */}
+      <section className="shell pb-24 lg:pb-32">
+        <div className="flex flex-col items-start gap-6 rounded-card bg-action px-8 py-14 text-action-foreground sm:px-14 lg:py-20">
+          <h2 className="max-w-[16ch] text-h1">
+            12분이면 내가 숫자로 보입니다
+          </h2>
+          <p className="max-w-[40ch] text-lead text-action-foreground/70">
+            회원가입도, 이메일도 필요 없습니다. 결과가 마음에 들면 그때 저장하세요.
+          </p>
+          <Button asChild size="lg" variant="subtle" className="mt-2 bg-action-foreground text-action hover:opacity-90">
+            <Link href="/start">무료로 검사 시작하기</Link>
           </Button>
-        </Link>
+        </div>
       </section>
     </>
   );

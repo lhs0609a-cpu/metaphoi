@@ -20,12 +20,14 @@ const config: Config = {
         sans: [
           'Pretendard Variable',
           'Pretendard',
-          'var(--font-sans)',
           'system-ui',
           '-apple-system',
+          'Segoe UI',
+          'Apple SD Gothic Neo',
+          'Malgun Gothic',
           'sans-serif',
         ],
-        'mono-stat': ['var(--font-mono-stat)', 'ui-monospace', 'monospace'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
         border: 'hsl(var(--border))',
@@ -36,6 +38,11 @@ const config: Config = {
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
+        },
+        // 주 버튼 전용. 라이트=잉크, 다크=흰색으로 자동 반전된다
+        action: {
+          DEFAULT: 'hsl(var(--action))',
+          foreground: 'hsl(var(--action-foreground))',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -138,18 +145,19 @@ const config: Config = {
         pill: 'var(--radius-pill)',
       },
 
-      // 타이포 스케일 — 1.22 비율. globals.css의 --fs-* 와 1:1
+      // 타이포 스케일 — globals.css의 --fs-* 와 1:1.
+      // 행간은 한글 기준. 제목이 커질수록 자간을 더 조인다.
       fontSize: {
-        micro: ['var(--fs-micro)', { lineHeight: '1.45' }],
-        tiny: ['var(--fs-tiny)', { lineHeight: '1.5' }],
-        small: ['var(--fs-small)', { lineHeight: '1.55' }],
-        body: ['var(--fs-body)', { lineHeight: '1.65' }],
-        lead: ['var(--fs-lead)', { lineHeight: '1.6' }],
-        h4: ['var(--fs-h4)', { lineHeight: '1.35', letterSpacing: '-0.014em' }],
-        h3: ['var(--fs-h3)', { lineHeight: '1.3', letterSpacing: '-0.017em' }],
-        h2: ['var(--fs-h2)', { lineHeight: '1.25', letterSpacing: '-0.019em' }],
-        h1: ['var(--fs-h1)', { lineHeight: '1.18', letterSpacing: '-0.022em' }],
-        display: ['var(--fs-display)', { lineHeight: '1.06', letterSpacing: '-0.028em' }],
+        micro: ['var(--fs-micro)', { lineHeight: '1.5' }],
+        tiny: ['var(--fs-tiny)', { lineHeight: '1.55' }],
+        small: ['var(--fs-small)', { lineHeight: '1.6' }],
+        body: ['var(--fs-body)', { lineHeight: '1.7' }],
+        lead: ['var(--fs-lead)', { lineHeight: '1.65', letterSpacing: '-0.011em' }],
+        h4: ['var(--fs-h4)', { lineHeight: '1.45', letterSpacing: '-0.018em' }],
+        h3: ['var(--fs-h3)', { lineHeight: '1.38', letterSpacing: '-0.022em' }],
+        h2: ['var(--fs-h2)', { lineHeight: '1.32', letterSpacing: '-0.026em' }],
+        h1: ['var(--fs-h1)', { lineHeight: '1.22', letterSpacing: '-0.032em' }],
+        display: ['var(--fs-display)', { lineHeight: '1.1', letterSpacing: '-0.04em' }],
       },
 
       // 밀도 — 모드가 바꾸는 단일 손잡이

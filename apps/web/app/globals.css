@@ -5,19 +5,21 @@
 /* ==========================================================================
    Metaphoi Design System
    --------------------------------------------------------------------------
-   설계 명제: 측정의 정밀함 × 성취의 즐거움
+   설계 명제: 측정의 정밀함 × 읽기의 편안함
 
-   이 제품은 사람을 측정해서 스탯으로 보여준다. 두 성격이 충돌한다.
-     - 측정은 조심스러워야 한다. 신뢰구간을 보여주고, 모르면 모른다고 해야 한다.
-     - 스탯은 즐거워야 한다. 랭크가 뜨고, 바가 차오르고, 공유하고 싶어야 한다.
+   이 제품은 사람을 측정해서 숫자로 보여준다. 그래서 두 가지를 지킨다.
+     - 색은 데이터의 것이다. 장식에 쓰지 않는다.
+       동작(버튼)은 잉크 블랙, 강조와 링크는 시그널 청록,
+       능력 카테고리 5색은 오직 그 다섯 축에만 쓴다.
+     - 위계는 타이포가 만든다. 테두리와 배경색으로 만들지 않는다.
+       크기·굵기·색농도 세 개로 층을 나누고, 그 이상은 쓰지 않는다.
 
-   그래서 하나의 토큰 위에 두 개의 표면(surface)을 얹는다.
-     data-surface="play"  B2C — 검사·결과·공유. 어두운 발광 세계. 큰 모션.
-     data-surface="ops"   B2B — 기업·채용·대시보드. 밝은 계측기. 촘촘한 밀도.
+   하나의 토큰 위에 두 개의 밀도를 얹는다.
+     data-surface="play"  B2C — 검사·결과·공유. 넉넉한 여백, 큰 타깃, 큰 모션.
+     data-surface="ops"   B2B — 기업·채용·대시보드. 촘촘한 밀도, 작은 모션.
 
-   색·타입·간격 스케일은 두 모드가 완전히 공유한다.
-   다르게 두는 것은 밀도(--row-h), 곡률(--radius-*), 고도(--shadow-*),
-   모션 크기(--motion-scale) 네 가지뿐이다.
+   색과 타입 스케일은 두 모드가 완전히 공유한다.
+   다른 것은 밀도(--row-h, --pad-*), 곡률(--radius-*), 모션(--motion-scale)뿐이다.
    ========================================================================== */
 
 @layer base {
@@ -26,86 +28,91 @@
        1. 원색 스케일 (raw) — 직접 쓰지 말고 아래 의미 토큰을 통해 쓸 것
        --------------------------------------------------------------- */
 
-    /* Signal — 브랜드. 계측기의 눈금 색. 측정·주요 동작·링크 */
-    --signal-50: 184 60% 96%;
-    --signal-100: 184 58% 90%;
-    --signal-200: 184 56% 78%;
-    --signal-300: 184 56% 62%;
-    --signal-400: 184 64% 48%;
-    --signal-500: 184 78% 36%;
-    --signal-600: 185 82% 29%;
-    --signal-700: 186 80% 23%;
-    --signal-800: 187 74% 18%;
-    --signal-900: 188 68% 13%;
+    /* Ink — 중립. 거의 무채색에 아주 살짝 푸른 기. 배경·글자·동작의 색 */
+    --ink-0: 0 0% 100%;
+    --ink-50: 210 20% 98%;
+    --ink-100: 210 17% 95%;
+    --ink-200: 213 15% 91%;
+    --ink-300: 214 13% 84%;
+    --ink-400: 215 11% 65%;
+    --ink-500: 216 10% 49%;
+    --ink-600: 217 13% 37%;
+    --ink-700: 218 17% 26%;
+    --ink-800: 219 23% 16%;
+    --ink-900: 220 27% 10%;
+    --ink-950: 222 32% 6%;
 
-    /* Ember — 성취. XP·랭크·레벨업. play 모드에서만 강조로 쓴다 */
-    --ember-300: 40 96% 72%;
-    --ember-400: 38 95% 62%;
-    --ember-500: 36 94% 54%;
-    --ember-600: 32 90% 46%;
-
-    /* Ink — 중립. 순수 회색이 아니라 청록으로 살짝 기울인 회색 */
-    --ink-0: 180 24% 99%;
-    --ink-50: 180 20% 97%;
-    --ink-100: 185 16% 94%;
-    --ink-200: 188 14% 88%;
-    --ink-300: 190 12% 78%;
-    --ink-400: 195 10% 62%;
-    --ink-500: 198 10% 47%;
-    --ink-600: 200 12% 36%;
-    --ink-700: 202 16% 26%;
-    --ink-800: 204 22% 16%;
-    --ink-900: 200 28% 10%;
-    --ink-950: 198 32% 6%;
+    /* Signal — 브랜드. 계측기의 눈금 색. 링크·활성·포커스·데이터 */
+    --signal-50: 185 62% 96%;
+    --signal-100: 185 60% 90%;
+    --signal-200: 186 58% 78%;
+    --signal-300: 186 62% 60%;
+    --signal-400: 187 76% 44%;
+    --signal-500: 188 88% 36%;
+    --signal-600: 189 92% 29%;
+    --signal-700: 190 88% 23%;
+    --signal-800: 191 80% 18%;
+    --signal-900: 192 72% 13%;
 
     /* ---------------------------------------------------------------
-       2. 능력 카테고리 — 5색. 레이더 차트의 다섯 축과 1:1 대응
+       2. 능력 카테고리 — 5색. 레이더 차트의 다섯 축과 1:1 대응.
+          이 다섯 색은 여기 말고 어디에도 쓰지 않는다.
        --------------------------------------------------------------- */
-    --cat-mental: 243 72% 62%;
-    --cat-social: 162 68% 42%;
-    --cat-work: 35 92% 52%;
-    --cat-physical: 346 78% 58%;
-    --cat-potential: 272 70% 63%;
+    --cat-mental: 245 66% 58%;
+    --cat-social: 168 62% 38%;
+    --cat-work: 32 88% 48%;
+    --cat-physical: 344 72% 55%;
+    --cat-potential: 274 62% 60%;
 
     /* ---------------------------------------------------------------
        3. 랭크 — 백분위 기준. S=상위 4%
        --------------------------------------------------------------- */
-    --rank-s: 42 96% 55%;
-    --rank-a: 272 70% 63%;
-    --rank-b: 195 85% 52%;
-    --rank-c: 162 68% 42%;
-    --rank-d: 205 12% 52%;
+    --rank-s: 38 92% 50%;
+    --rank-a: 274 62% 60%;
+    --rank-b: 200 84% 46%;
+    --rank-c: 168 62% 38%;
+    --rank-d: 215 11% 55%;
 
     /* ---------------------------------------------------------------
-       4. 의미 색 — 상태. 브랜드색과 절대 겹치지 않게 둔다
+       4. 의미 색 — 상태. 브랜드색과 겹치지 않게 둔다
        --------------------------------------------------------------- */
-    --ok: 152 62% 36%;
-    --ok-soft: 152 55% 94%;
-    --warn: 32 88% 42%;
-    --warn-soft: 38 90% 94%;
-    --danger: 2 72% 48%;
-    --danger-soft: 2 76% 96%;
-    --info: 205 82% 44%;
-    --info-soft: 205 80% 95%;
+    --ok: 157 64% 32%;
+    --ok-soft: 152 54% 95%;
+    --warn: 28 84% 42%;
+    --warn-soft: 36 88% 95%;
+    --danger: 355 74% 46%;
+    --danger-soft: 355 80% 96%;
+    --info: 210 84% 44%;
+    --info-soft: 208 82% 96%;
 
     /* ---------------------------------------------------------------
-       5. 표면 토큰 (기본값 = ops 라이트)
+       5. 표면 토큰 (기본값 = 라이트)
        --------------------------------------------------------------- */
-    --background: var(--ink-50);
+    --background: var(--ink-0);
     --foreground: var(--ink-900);
 
-    --card: 0 0% 100%;
+    --card: var(--ink-0);
     --card-foreground: var(--ink-900);
-    --popover: 0 0% 100%;
+    --popover: var(--ink-0);
     --popover-foreground: var(--ink-900);
 
-    /* 한 단계 들어간 면 — 표 헤더, 코드 블록, 비활성 트랙 */
-    --sunk: var(--ink-100);
+    /* 한 단계 들어간 면 — 표 헤더, 트랙, 조용한 블록 */
+    --sunk: var(--ink-50);
     /* 한 단계 올라온 면 — 떠 있는 패널 */
-    --raised: 0 0% 100%;
+    --raised: var(--ink-0);
 
+    /* primary = 브랜드/강조. 링크·활성 상태·데이터 강조에 쓴다.
+       주 버튼의 색은 여기가 아니라 Button 컴포넌트가 잉크로 따로 정한다.
+       색을 아끼는 규칙이 컴포넌트 한 곳에만 있으면 어기기 어렵다. */
     --primary: var(--signal-600);
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: var(--ink-0);
+
+    /* 동작 색 — 주 버튼. 라이트에서는 잉크, 다크에서는 반전된다.
+       ink-900 같은 숫자 끝 이름을 text-* 에 쓰면 tailwind-merge가
+       글자 크기로 오인해 지워버리므로, 동작 색은 반드시 이 쌍을 쓴다. */
+    --action: var(--ink-900);
+    --action-foreground: var(--ink-0);
+
     --secondary: var(--ink-100);
     --secondary-foreground: var(--ink-800);
     --muted: var(--ink-100);
@@ -113,7 +120,7 @@
     --accent: var(--signal-50);
     --accent-foreground: var(--signal-700);
     --destructive: var(--danger);
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: var(--ink-0);
 
     --border: var(--ink-200);
     --border-strong: var(--ink-300);
@@ -121,47 +128,57 @@
     --ring: var(--signal-500);
 
     /* ---------------------------------------------------------------
-       6. 모드가 바꾸는 네 가지
+       6. 곡률 — 토스 계열의 넉넉한 라운드. 모드가 조정한다
        --------------------------------------------------------------- */
-    --radius: 0.5rem;
-    --radius-card: 0.625rem;
-    --radius-control: 0.5rem;
+    --radius: 0.75rem;
+    --radius-card: 1rem;
+    --radius-control: 0.75rem;
     --radius-pill: 999px;
 
-    --shadow-1: 0 1px 2px hsl(var(--ink-900) / 0.06);
-    --shadow-2: 0 1px 2px hsl(var(--ink-900) / 0.05), 0 6px 16px -8px hsl(var(--ink-900) / 0.16);
-    --shadow-3: 0 2px 4px hsl(var(--ink-900) / 0.05), 0 16px 40px -16px hsl(var(--ink-900) / 0.22);
-    --glow: none;
+    /* ---------------------------------------------------------------
+       7. 고도 — 아주 옅게. 그림자로 위계를 만들지 않는다
+       --------------------------------------------------------------- */
+    --shadow-1: 0 1px 2px hsl(var(--ink-900) / 0.04);
+    --shadow-2: 0 2px 4px hsl(var(--ink-900) / 0.04), 0 8px 20px -12px hsl(var(--ink-900) / 0.14);
+    --shadow-3: 0 4px 8px hsl(var(--ink-900) / 0.05), 0 24px 48px -24px hsl(var(--ink-900) / 0.2);
 
-    /* 리스트/표 한 줄 높이 — 밀도의 단일 손잡이 */
-    --row-h: 2.75rem;
-    --pad-block: 1rem;
+    /* ---------------------------------------------------------------
+       8. 밀도 — 리스트/표 한 줄 높이가 밀도의 단일 손잡이
+       --------------------------------------------------------------- */
+    --row-h: 3rem;
+    --pad-block: 1.25rem;
     --pad-inline: 1.25rem;
 
-    /* 모션 크기. 0이면 변형 없이 페이드만 */
-    --motion-scale: 0.45;
+    /* ---------------------------------------------------------------
+       9. 모션 — 모든 변형은 --motion-scale을 곱한다
+       --------------------------------------------------------------- */
+    --motion-scale: 1;
     --dur-fast: 120ms;
     --dur: 200ms;
     --dur-slow: 420ms;
     --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
     --ease-out-back: cubic-bezier(0.34, 1.4, 0.64, 1);
 
-    /* 타이포 스케일 — 1.22 비율. 본문 16px 고정 */
-    --fs-micro: 0.6875rem;  /* 11 */
-    --fs-tiny: 0.75rem;     /* 12 */
-    --fs-small: 0.8125rem;  /* 13 */
-    --fs-body: 0.9375rem;   /* 15 */
-    --fs-base: 1rem;        /* 16 */
+    /* ---------------------------------------------------------------
+       10. 타이포 스케일
+           한글 본문은 라틴보다 조금 크고 행간이 넓어야 읽힌다.
+           display/h1은 뷰포트에 따라 늘어난다 — 모바일에서 헤드라인이
+           네 줄로 깨지는 것이 큰 글씨보다 나쁘다.
+       --------------------------------------------------------------- */
+    --fs-micro: 0.75rem;    /* 12 */
+    --fs-tiny: 0.8125rem;   /* 13 */
+    --fs-small: 0.875rem;   /* 14 */
+    --fs-body: 1rem;        /* 16 */
     --fs-lead: 1.125rem;    /* 18 */
     --fs-h4: 1.25rem;       /* 20 */
     --fs-h3: 1.5rem;        /* 24 */
-    --fs-h2: 1.875rem;      /* 30 */
-    --fs-h1: 2.375rem;      /* 38 */
-    --fs-display: 3.25rem;  /* 52 */
+    --fs-h2: clamp(1.625rem, 1.3rem + 1.4vw, 2rem);      /* 26 → 32 */
+    --fs-h1: clamp(2rem, 1.4rem + 2.6vw, 2.75rem);       /* 32 → 44 */
+    --fs-display: clamp(2.5rem, 1.4rem + 4.6vw, 4rem);   /* 40 → 64 */
   }
 
   /* =================================================================
-     ops 다크 — B2B는 사용자 테마를 따른다
+     다크 — 도구 화면(B2B)이 사용자 테마를 따를 때
      ================================================================= */
   .dark {
     --background: var(--ink-950);
@@ -171,105 +188,66 @@
     --card-foreground: var(--ink-50);
     --popover: var(--ink-900);
     --popover-foreground: var(--ink-50);
-    --sunk: 200 26% 12%;
-    --raised: 202 22% 14%;
+    --sunk: 220 24% 12%;
+    --raised: 219 21% 15%;
 
-    --primary: var(--signal-400);
+    --primary: var(--signal-300);
     --primary-foreground: var(--ink-950);
-    --secondary: 202 20% 18%;
+    --secondary: 219 19% 19%;
     --secondary-foreground: var(--ink-100);
-    --muted: 202 20% 18%;
+    --muted: 219 19% 19%;
     --muted-foreground: var(--ink-400);
-    --accent: 187 60% 14%;
+    --accent: 191 52% 15%;
     --accent-foreground: var(--signal-200);
 
-    --border: 202 18% 22%;
-    --border-strong: 202 16% 32%;
-    --input: 202 18% 24%;
-    --ring: var(--signal-400);
+    --border: 219 16% 22%;
+    --border-strong: 218 14% 32%;
+    --input: 219 16% 24%;
+    --ring: var(--signal-300);
 
-    --ok: 152 55% 52%;
-    --ok-soft: 152 45% 14%;
-    --warn: 38 88% 60%;
-    --warn-soft: 34 60% 14%;
-    --danger: 2 78% 64%;
-    --danger-soft: 2 50% 16%;
-    --info: 205 82% 62%;
-    --info-soft: 205 60% 14%;
+    --action: var(--ink-0);
+    --action-foreground: var(--ink-900);
+
+    --ok: 157 54% 50%;
+    --ok-soft: 157 42% 14%;
+    --warn: 34 84% 58%;
+    --warn-soft: 30 58% 14%;
+    --danger: 355 76% 64%;
+    --danger-soft: 355 48% 16%;
+    --info: 208 82% 62%;
+    --info-soft: 208 56% 14%;
 
     --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
-    --shadow-2: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.7);
-    --shadow-3: 0 2px 6px rgb(0 0 0 / 0.45), 0 20px 48px -20px rgb(0 0 0 / 0.8);
+    --shadow-2: 0 2px 4px rgb(0 0 0 / 0.4), 0 8px 24px -14px rgb(0 0 0 / 0.7);
+    --shadow-3: 0 4px 8px rgb(0 0 0 / 0.45), 0 24px 52px -22px rgb(0 0 0 / 0.85);
   }
 
   /* =================================================================
-     play — B2C. 테마와 무관하게 항상 같은 어두운 발광 세계.
-     게임 클라이언트는 라이트 모드를 갖지 않는다.
+     play — B2C. 검사·결과·공유.
+     한 손으로 쓰는 화면이라 타깃이 크고 여백이 넉넉하다.
      ================================================================= */
   [data-surface='play'] {
-    --background: 198 34% 5%;
-    --foreground: 180 18% 96%;
-
-    --card: 200 28% 9%;
-    --card-foreground: 180 18% 96%;
-    --popover: 200 30% 11%;
-    --popover-foreground: 180 18% 96%;
-    --sunk: 200 30% 7%;
-    --raised: 200 24% 13%;
-
-    --primary: var(--signal-400);
-    --primary-foreground: 198 40% 6%;
-    --secondary: 200 22% 16%;
-    --secondary-foreground: var(--ink-100);
-    --muted: 200 22% 15%;
-    --muted-foreground: 195 12% 58%;
-    --accent: 186 62% 13%;
-    --accent-foreground: var(--signal-200);
-
-    --border: 199 22% 18%;
-    --border-strong: 197 20% 28%;
-    --input: 199 22% 20%;
-    --ring: var(--signal-400);
-
-    --ok: 152 58% 52%;
-    --ok-soft: 152 45% 13%;
-    --warn: 38 90% 62%;
-    --warn-soft: 34 60% 13%;
-    --danger: 2 80% 66%;
-    --danger-soft: 2 50% 15%;
-    --info: 205 84% 64%;
-    --info-soft: 205 60% 13%;
-
-    /* 더 둥글고, 더 떠 있고, 더 크게 움직인다 */
     --radius: 0.875rem;
-    --radius-card: 1.125rem;
-    --radius-control: 0.75rem;
-
-    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.5);
-    --shadow-2: 0 2px 6px rgb(0 0 0 / 0.5), 0 12px 32px -14px rgb(0 0 0 / 0.9);
-    --shadow-3: 0 4px 12px rgb(0 0 0 / 0.55), 0 28px 60px -24px rgb(0 0 0 / 1);
-    --glow: 0 0 0 1px hsl(var(--signal-400) / 0.18), 0 0 32px -8px hsl(var(--signal-400) / 0.35);
-
-    --row-h: 3.25rem;
-    --pad-block: 1.375rem;
+    --radius-card: 1.25rem;
+    --radius-control: 0.875rem;
+    --row-h: 3.5rem;
+    --pad-block: 1.5rem;
     --pad-inline: 1.5rem;
-
     --motion-scale: 1;
-    --dur-slow: 620ms;
+    --dur-slow: 520ms;
   }
 
   /* =================================================================
-     ops — 명시적으로 붙였을 때. 라이트/다크는 위 규칙이 처리한다
+     ops — B2B. 한 화면에 많이 담아야 하므로 촘촘하게.
      ================================================================= */
   [data-surface='ops'] {
-    --radius: 0.5rem;
-    --radius-card: 0.625rem;
-    --radius-control: 0.5rem;
-    --row-h: 2.5rem;
-    --pad-block: 0.875rem;
+    --radius: 0.625rem;
+    --radius-card: 0.875rem;
+    --radius-control: 0.625rem;
+    --row-h: 2.75rem;
+    --pad-block: 1rem;
     --pad-inline: 1.125rem;
-    --motion-scale: 0.4;
-    --glow: none;
+    --motion-scale: 0.45;
   }
 
   * {
@@ -283,11 +261,13 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-size: var(--fs-base);
+    font-size: var(--fs-body);
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    font-feature-settings: 'ss01' on, 'cv01' on;
+    /* 한글에서 자간을 아주 살짝 조여야 Pretendard가 뭉치지 않는다 */
+    letter-spacing: -0.005em;
+    word-break: keep-all;
   }
 
   /* 표면 경계에서 배경이 끊기지 않게 */
@@ -296,26 +276,28 @@
     color: hsl(var(--foreground));
   }
 
+  /* 제목은 크기가 커질수록 자간을 더 조인다.
+     한글 큰 글씨는 기본 자간이면 성기게 보인다. */
   h1, h2, h3, h4 {
     text-wrap: balance;
-    letter-spacing: -0.017em;
-    line-height: 1.28;
     font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.022em;
   }
 
   p, li {
     text-wrap: pretty;
   }
 
-  /* 포커스는 항상 보인다. 링 두께는 모드와 무관하게 고정 */
+  /* 포커스는 항상 보인다 */
   :where(a, button, input, select, textarea, [tabindex]):focus-visible {
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
-    border-radius: calc(var(--radius-control) * 0.6);
+    border-radius: calc(var(--radius-control) * 0.7);
   }
 
   ::selection {
-    background: hsl(var(--signal-400) / 0.28);
+    background: hsl(var(--signal-300) / 0.32);
   }
 
   /* 숫자가 세로로 정렬되어야 하는 곳 전부 */
@@ -333,7 +315,10 @@
     border: 3px solid transparent;
     background-clip: content-box;
   }
-  ::-webkit-scrollbar-thumb:hover { background-color: hsl(var(--muted-foreground)); background-clip: content-box; }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--muted-foreground));
+    background-clip: content-box;
+  }
 }
 
 /* ==========================================================================
@@ -341,12 +326,22 @@
    ========================================================================== */
 
 @layer components {
-  /* 기본 패널. 모드에 따라 곡률과 고도가 자동으로 바뀐다 */
+  /* 페이지 기본 폭. 본문이 한 줄에 너무 길면 읽히지 않는다 */
+  .shell {
+    width: 100%;
+    max-width: 72rem; /* 1152 */
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .shell { padding-inline: 2rem; }
+  }
+
+  /* 기본 패널. 테두리 하나로 충분하다 — 그림자까지 겹치면 지저분하다 */
   .surface {
     background-color: hsl(var(--card));
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius-card);
-    box-shadow: var(--shadow-1);
   }
 
   .surface-raised {
@@ -356,53 +351,32 @@
     box-shadow: var(--shadow-2);
   }
 
-  /* play 모드에서만 발광. ops에서는 --glow가 none이라 아무 일도 없다 */
-  .surface-hero {
-    background-color: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius-card);
-    box-shadow: var(--shadow-2), var(--glow);
-  }
-
   .sunk {
     background-color: hsl(var(--sunk));
     border-radius: var(--radius-control);
   }
 
-  /* 라벨 — 대문자 트래킹. 표·섹션 머리에 쓴다 */
+  /* 라벨 — 섹션 머리. 대문자 트래킹은 라틴에만 걸린다 */
   .eyebrow {
-    font-size: var(--fs-micro);
+    font-size: var(--fs-tiny);
     font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0.02em;
     color: hsl(var(--muted-foreground));
   }
 
-  /* 스탯 숫자 — 고정폭. 카운트업 중에도 폭이 흔들리지 않는다 */
+  /* 스탯 숫자 — 고정폭 숫자. 별도 mono를 쓰지 않는다.
+     Pretendard의 tabular-nums가 본문과 같은 골격이라 화면이 조용해진다. */
   .stat-num {
-    font-family: var(--font-mono-stat), ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
-    font-weight: 600;
-    letter-spacing: -0.02em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    font-feature-settings: 'ss01';
   }
 
   /* 가로 스크롤이 필요한 것은 자기 안에서만 스크롤한다 */
   .scroll-x {
     overflow-x: auto;
     overscroll-behavior-x: contain;
-  }
-
-  /* 그라데이션 텍스트 — play 모드 히어로 한 곳에만 */
-  .text-signal-gradient {
-    background: linear-gradient(
-      100deg,
-      hsl(var(--signal-300)) 0%,
-      hsl(var(--signal-400)) 45%,
-      hsl(var(--ember-400)) 130%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
 
   /* 측정 정직성 배지 — 규준 없음/잠정 상태를 숨기지 않는다 */
@@ -412,22 +386,10 @@
     gap: 0.35em;
     font-size: var(--fs-micro);
     font-weight: 600;
-    letter-spacing: 0.04em;
-    padding: 0.15em 0.5em;
+    padding: 0.2em 0.6em;
     border-radius: var(--radius-pill);
     background: hsl(var(--warn-soft));
     color: hsl(var(--warn));
-    border: 1px solid hsl(var(--warn) / 0.25);
-  }
-
-  /* 배경 격자 — play 히어로. 계측기 눈금의 은유 */
-  .grid-field {
-    background-image:
-      linear-gradient(hsl(var(--border) / 0.5) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--border) / 0.5) 1px, transparent 1px);
-    background-size: 44px 44px;
-    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 20%, transparent 78%);
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 20%, transparent 78%);
   }
 
   /* 스켈레톤 */
@@ -441,6 +403,12 @@
     background-size: 400% 100%;
     animation: shimmer calc(1600ms / max(var(--motion-scale), 0.35)) linear infinite;
     border-radius: var(--radius-control);
+  }
+
+  /* 얇은 규칙선 — 섹션을 나누되 무겁지 않게 */
+  .rule {
+    height: 1px;
+    background: hsl(var(--border));
   }
 }
 
@@ -459,48 +427,30 @@
   .anim-bar {
     animation: bar-fill var(--dur-slow) var(--ease) both;
   }
-  .anim-glow-pulse {
-    animation: glow-pulse 2.4s ease-in-out infinite;
-  }
 
   /* 순차 등장 — 리스트에 걸면 계단식으로 나타난다 */
   .stagger > * {
     animation: rise var(--dur-slow) var(--ease) both;
   }
   .stagger > *:nth-child(1) { animation-delay: 0ms; }
-  .stagger > *:nth-child(2) { animation-delay: 60ms; }
-  .stagger > *:nth-child(3) { animation-delay: 120ms; }
-  .stagger > *:nth-child(4) { animation-delay: 180ms; }
-  .stagger > *:nth-child(5) { animation-delay: 240ms; }
-  .stagger > *:nth-child(6) { animation-delay: 300ms; }
-  .stagger > *:nth-child(7) { animation-delay: 360ms; }
-  .stagger > *:nth-child(8) { animation-delay: 420ms; }
+  .stagger > *:nth-child(2) { animation-delay: 50ms; }
+  .stagger > *:nth-child(3) { animation-delay: 100ms; }
+  .stagger > *:nth-child(4) { animation-delay: 150ms; }
+  .stagger > *:nth-child(5) { animation-delay: 200ms; }
+  .stagger > *:nth-child(6) { animation-delay: 250ms; }
+  .stagger > *:nth-child(7) { animation-delay: 300ms; }
+  .stagger > *:nth-child(8) { animation-delay: 350ms; }
 }
 
 @keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(calc(14px * var(--motion-scale)));
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(calc(12px * var(--motion-scale))); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pop {
-  0% {
-    opacity: 0;
-    transform: scale(calc(1 - 0.35 * var(--motion-scale)));
-  }
-  60% {
-    opacity: 1;
-    transform: scale(calc(1 + 0.06 * var(--motion-scale)));
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+  0% { opacity: 0; transform: scale(calc(1 - 0.3 * var(--motion-scale))); }
+  60% { opacity: 1; transform: scale(calc(1 + 0.04 * var(--motion-scale))); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes bar-fill {
@@ -518,20 +468,10 @@
   100% { background-position: -100% 0; }
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--signal-400) / 0.35); }
-  50% { box-shadow: 0 0 0 calc(10px * var(--motion-scale)) hsl(var(--signal-400) / 0); }
-}
-
 @keyframes rank-reveal {
-  0% { opacity: 0; transform: scale(calc(1 - 0.6 * var(--motion-scale))) rotate(calc(-8deg * var(--motion-scale))); }
-  70% { opacity: 1; transform: scale(calc(1 + 0.12 * var(--motion-scale))) rotate(0deg); }
+  0% { opacity: 0; transform: scale(calc(1 - 0.5 * var(--motion-scale))); }
+  70% { opacity: 1; transform: scale(calc(1 + 0.08 * var(--motion-scale))); }
   100% { opacity: 1; transform: scale(1); }
-}
-
-@keyframes xp-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: calc(1 - 0.45 * var(--motion-scale)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -543,8 +483,5 @@
     --dur: 1ms;
     --dur-slow: 1ms;
   }
-  .anim-glow-pulse,
-  .skeleton {
-    animation: none;
-  }
+  .skeleton { animation: none; }
 }

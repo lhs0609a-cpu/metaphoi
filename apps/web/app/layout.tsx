@@ -1,48 +1,41 @@
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono-stat' });
-
 export const metadata: Metadata = {
-  title: 'Metaphoi (메타포이) - 종합 인재 평가 플랫폼',
+  title: {
+    default: 'Metaphoi — 성격검사 7개를 겹쳐 능력치 30개로',
+    template: '%s · Metaphoi',
+  },
   description:
-    '7가지 심리검사를 한 번에! MBTI, DISC, 에니어그램, Holland, 사주, 사상체질, 혈액형을 종합 분석하고 30가지 능력치를 확인하세요.',
-  keywords: ['MBTI', 'DISC', '에니어그램', 'Holland', '사주', '사상체질', '성격검사', '심리검사', '인재평가', '능력치'],
+    'MBTI, DISC, 에니어그램, Holland, 사주, 사상체질, 혈액형. 서로 다른 7가지 관점을 한 사람 위에 겹쳐 능력치 30개로 환산합니다. 53문항, 약 12분, 회원가입 없이.',
+  keywords: ['성격검사', 'MBTI', 'DISC', '에니어그램', 'Holland', '사주', '사상체질', '능력치', '적성검사', '채용'],
   openGraph: {
-    title: 'Metaphoi - 7가지 심리검사 종합 분석',
-    description: 'MBTI + DISC + 에니어그램 + Holland + 사주 + 사상체질 + 혈액형 종합 분석. 53문항으로 30가지 능력치를 한 번에!',
+    title: 'Metaphoi — 성격검사 7개를 겹쳐 능력치 30개로',
+    description: '53문항으로 7가지 검사를 한 번에. 취향이 아니라 수치가 남습니다.',
     type: 'website',
     locale: 'ko_KR',
     siteName: 'Metaphoi',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Metaphoi 종합 심리검사',
-      },
-    ],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Metaphoi 종합 심리검사' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Metaphoi - 7가지 심리검사 종합 분석',
-    description: '53문항으로 MBTI, DISC, 에니어그램, Holland, 사주, 사상체질, 혈액형을 한 번에 분석!',
+    title: 'Metaphoi — 성격검사 7개를 겹쳐 능력치 30개로',
+    description: '53문항으로 7가지 검사를 한 번에. 취향이 아니라 수치가 남습니다.',
     images: ['/og-image.png'],
   },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ko">
       <head>
-        {/* Pretendard 한글 산세리프 */}
+        {/*
+          Pretendard 하나로 한글과 라틴을 모두 처리한다.
+          두 벌을 섞으면 숫자와 한글의 골격이 달라져 표가 흔들린다.
+          dynamic-subset은 쓰인 글자만 받아오므로 첫 화면이 빨라진다.
+        */}
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
         <link
           rel="stylesheet"
           as="style"
@@ -52,7 +45,7 @@ export default function RootLayout({
         {/* 카카오톡 공유 SDK */}
         <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js" async />
       </head>
-      <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body>
         {children}
         <Toaster />
       </body>
