@@ -1,33 +1,86 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Field, Select, Textarea } from '@/components/ui/field';
+import { EmptyState, PageLoading } from '@/components/ui/states';
+import { PageHeader } from '@/components/layouts/page-header';
+import { FitScore } from '@/components/measure/fit-score';
+import { useToast } from '@/components/ui/use-toast';
 import { useCompanyAuthStore } from '@/lib/company-auth';
 import { marketplaceApi } from '@/lib/marketplace-api';
 
-const STAGES = ['applied', 'screening', 'interview_scheduled', 'interviewing', 'evaluation', 'offer', 'hired', 'rejected'];
+const STAGES = [
+  'applied', 'screening', 'interview_scheduled', 'interviewing',
+  'evaluation', 'offer', 'hired', 'rejected',
+];
+
 const STAGE_LABELS: Record<string, string> = {
   applied: '지원', screening: '서류심사', interview_scheduled: '면접예정',
   interviewing: '면접진행', evaluation: '평가', offer: '오퍼',
   hired: '채용완료', rejected: '불합격',
 };
 
+const STAGE_TONE: Record<string, 'info' | 'signal' | 'warn' | 'ok' | 'neutral'> = {
+  applied: 'info', screening: 'info', interview_scheduled: 'signal',
+  interviewing: 'signal', evaluation: 'warn', offer: 'ok',
+  hired: 'ok', rejected: 'neutral',
+};
+
+const INTERVIEW_TYPE: Record<string, string> = {
+  phone: '전화', video: '화상', onsite: '대면', assignment: '과제',
+};
+
+interface Interview {
+  id: string;
+  round?: number;
+  interview_type?: string;
+  scheduled_at?: string;
+  status?: string;
+  evaluations?: unknown[];
+}
+
+interface Note {
+  id: string;
+  content: string;
+  created_at: string;
+  company_members?: { name?: string };
+}
+
+interface Application {
+  id: string;
+  stage?: string;
+  seeker_profiles?: { id?: string; display_name?: string };
+  job_postings?: { title?: string; companies?: { name?: string } };
+  matches?: { fit_score?: { total: number; ability?: number; culture?: number; condition?: number } };
+}
+
+/**
+ * 지원자 상세 — 전형 진행의 실제 작업 화면.
+ *
+ * 되돌릴 수 없는 동작(오퍼 발송, 채용 확정)은 confirm() 대신 인라인 확인 단계를 둔다.
+ * 브라우저 confirm은 실수로 눌러도 취소할 수 없고, 어떤 동작인지 다시 설명하지 못한다.
+ */
 export default function ApplicationDetailPage() {
   const router = useRouter();
   const params = useParams();
   const appId = params.appId as string;
   const { token, isAuthenticated } = useCompanyAuthStore();
+  const { toast } = useToast();
 
-  const [app, setApp] = useState<any>(null);
-  const [interviews, setInterviews] = useState<any[]>([]);
-  const [notes, setNotes] = useState<any[]>([]);
+  const [app, setApp] = useState<Application | null>(null);
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [newNote, setNewNote] = useState('');
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<'offer' | 'hire' | null>(null);
 
-  // 면접 스케줄링 폼
   const [showInterviewForm, setShowInterviewForm] = useState(false);
   const [interviewForm, setInterviewForm] = useState({
     interview_type: 'video',
@@ -36,37 +89,49 @@ export default function ApplicationDetailPage() {
     location: '',
   });
 
-  useEffect(() => {
-    if (!isAuthenticated || !token) {
-      router.push('/company/login');
-      return;
-    }
-
-    loadData();
-  }, [appId, isAuthenticated, token, router]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!token) return;
     const [appRes, intRes, noteRes] = await Promise.all([
       marketplaceApi.applications.get(appId),
       marketplaceApi.applications.listInterviews(appId),
       marketplaceApi.applications.listNotes(appId, token),
     ]);
-    setApp(appRes.data);
-    setInterviews(Array.isArray(intRes.data) ? intRes.data : []);
-    setNotes(Array.isArray(noteRes.data) ? noteRes.data : []);
+    setApp((appRes.data as Application) ?? null);
+    setInterviews(Array.isArray(intRes.data) ? (intRes.data as Interview[]) : []);
+    setNotes(Array.isArray(noteRes.data) ? (noteRes.data as Note[]) : []);
     setLoading(false);
-  };
+  }, [appId, token]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !token) {
+      router.push('/company/login');
+      return;
+    }
+    loadData();
+  }, [isAuthenticated, token, router, loadData]);
 
   const handleStageChange = async (stage: string) => {
     if (!token) return;
-    await marketplaceApi.applications.updateStage(appId, stage, token);
+    setBusy('stage');
+    const res = await marketplaceApi.applications.updateStage(appId, stage, token);
+    setBusy(null);
+    if (res.error) {
+      toast({ title: '단계를 변경하지 못했습니다', description: res.error, variant: 'destructive' });
+      return;
+    }
+    toast({ title: `‘${STAGE_LABELS[stage]}’(으)로 이동했습니다` });
     loadData();
   };
 
   const handleAddNote = async () => {
     if (!token || !newNote.trim()) return;
-    await marketplaceApi.applications.createNote(appId, newNote, token);
+    setBusy('note');
+    const res = await marketplaceApi.applications.createNote(appId, newNote.trim(), token);
+    setBusy(null);
+    if (res.error) {
+      toast({ title: '메모를 저장하지 못했습니다', description: res.error, variant: 'destructive' });
+      return;
+    }
     setNewNote('');
     loadData();
   };
@@ -74,197 +139,331 @@ export default function ApplicationDetailPage() {
   const handleScheduleInterview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) return;
-
-    await marketplaceApi.applications.createInterview(appId, {
-      ...interviewForm,
-      round: interviews.length + 1,
-    }, token);
-
+    setBusy('interview');
+    const res = await marketplaceApi.applications.createInterview(
+      appId,
+      { ...interviewForm, round: interviews.length + 1 },
+      token,
+    );
+    setBusy(null);
+    if (res.error) {
+      toast({ title: '면접을 예약하지 못했습니다', description: res.error, variant: 'destructive' });
+      return;
+    }
     setShowInterviewForm(false);
     setInterviewForm({ interview_type: 'video', scheduled_at: '', duration_minutes: 60, location: '' });
+    toast({ title: '면접을 예약했습니다' });
     loadData();
   };
 
   const handleOffer = async () => {
-    if (!token || !confirm('오퍼를 보내시겠습니까?')) return;
-    await marketplaceApi.applications.sendOffer(appId, token);
+    if (!token) return;
+    setBusy('offer');
+    const res = await marketplaceApi.applications.sendOffer(appId, token);
+    setBusy(null);
+    setConfirming(null);
+    if (res.error) {
+      toast({ title: '오퍼를 보내지 못했습니다', description: res.error, variant: 'destructive' });
+      return;
+    }
+    toast({ title: '오퍼를 보냈습니다', description: '후보자에게 알림이 전달됩니다.' });
     loadData();
   };
 
   const handleHire = async () => {
-    if (!token || !confirm('채용을 확정하시겠습니까?')) return;
-    await marketplaceApi.applications.confirmHire(appId, token);
+    if (!token) return;
+    setBusy('hire');
+    const res = await marketplaceApi.applications.confirmHire(appId, token);
+    setBusy(null);
+    setConfirming(null);
+    if (res.error) {
+      toast({ title: '채용을 확정하지 못했습니다', description: res.error, variant: 'destructive' });
+      return;
+    }
+    toast({ title: '채용을 확정했습니다' });
     loadData();
   };
 
-  if (loading) {
+  if (loading) return <PageLoading label="지원자 정보를 불러오는 중" />;
+  if (!app) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
+      <EmptyState
+        title="지원 내역을 찾을 수 없습니다"
+        description="삭제되었거나 접근 권한이 없습니다."
+        action={{ label: '파이프라인으로', href: '/company/pipeline' }}
+      />
     );
   }
 
-  if (!app) return null;
+  const stage = app.stage ?? 'applied';
+  const currentIdx = STAGES.indexOf(stage);
+  const fit = app.matches?.fit_score;
+  const seekerId = app.seeker_profiles?.id;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      {/* 지원자 정보 */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-xl font-bold">
-                {app.seeker_profiles?.display_name || '후보자'}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {app.job_postings?.title || ''} · {app.job_postings?.companies?.name || ''}
-              </p>
-              {app.matches?.fit_score && (
-                <div className="flex gap-3 mt-2 text-sm">
-                  <span className="text-primary font-bold">핏 {app.matches.fit_score.total}%</span>
-                  <span className="text-muted-foreground">능력 {app.matches.fit_score.ability}%</span>
-                  <span className="text-muted-foreground">문화 {app.matches.fit_score.culture}%</span>
-                  <span className="text-muted-foreground">조건 {app.matches.fit_score.condition}%</span>
-                </div>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="px-3 py-1 text-xs rounded-full bg-primary/10 text-primary text-center">
-                {STAGE_LABELS[app.stage] || app.stage}
-              </span>
-              <select
-                className="text-xs border rounded px-2 py-1"
-                value=""
-                onChange={(e) => { if (e.target.value) handleStageChange(e.target.value); }}
-              >
-                <option value="">단계 변경...</option>
-                {STAGES.filter((s) => s !== app.stage).map((s) => (
-                  <option key={s} value={s}>{STAGE_LABELS[s]}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* 액션 버튼 */}
-          <div className="flex gap-2 mt-4">
-            <Button size="sm" variant="outline" onClick={() => setShowInterviewForm(!showInterviewForm)}>
-              면접 스케줄링
+    <div className="max-w-3xl">
+      <PageHeader
+        eyebrow={app.job_postings?.title}
+        title={app.seeker_profiles?.display_name || '후보자'}
+        description={app.job_postings?.companies?.name}
+        badge={
+          <Badge tone={STAGE_TONE[stage] ?? 'neutral'} size="md" dot>
+            {STAGE_LABELS[stage] ?? stage}
+          </Badge>
+        }
+        actions={
+          seekerId ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/company/candidates/${seekerId}`}>프로필 보기</Link>
             </Button>
-            <Button size="sm" variant="outline" onClick={handleOffer}>오퍼 보내기</Button>
-            <Button size="sm" onClick={handleHire}>채용 확정</Button>
-          </div>
-        </CardContent>
-      </Card>
+          ) : undefined
+        }
+      />
 
-      {/* 면접 스케줄링 */}
-      {showInterviewForm && (
-        <Card className="mb-6">
-          <CardHeader><CardTitle className="text-lg">면접 스케줄링</CardTitle></CardHeader>
-          <CardContent>
-            <form onSubmit={handleScheduleInterview} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-sm font-medium block mb-1">면접 유형</label>
-                  <select
-                    className="w-full border rounded-md px-3 py-2 text-sm"
-                    value={interviewForm.interview_type}
-                    onChange={(e) => setInterviewForm((f) => ({ ...f, interview_type: e.target.value }))}
-                  >
-                    <option value="phone">전화</option>
-                    <option value="video">화상</option>
-                    <option value="onsite">대면</option>
-                    <option value="assignment">과제</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium block mb-1">일시</label>
-                  <input
-                    type="datetime-local"
-                    className="w-full border rounded-md px-3 py-2 text-sm"
-                    value={interviewForm.scheduled_at}
-                    onChange={(e) => setInterviewForm((f) => ({ ...f, scheduled_at: e.target.value }))}
-                    required
+      {/* 전형 진행 바 */}
+      <section className="rounded-card border border-border bg-card px-pad-i py-pad-b">
+        <div className="scroll-x flex items-center gap-1 pb-1">
+          {STAGES.slice(0, 7).map((s, i) => {
+            const done = currentIdx >= 0 && i < currentIdx;
+            const active = s === stage;
+            return (
+              <div key={s} className="flex flex-1 items-center gap-1">
+                <span
+                  className={
+                    'whitespace-nowrap rounded-pill px-2.5 py-1 text-micro font-medium ' +
+                    (active
+                      ? 'bg-primary text-primary-foreground'
+                      : done
+                        ? 'bg-accent text-accent-foreground'
+                        : 'bg-secondary text-muted-foreground')
+                  }
+                >
+                  {STAGE_LABELS[s]}
+                </span>
+                {i < 6 ? (
+                  <span
+                    className={'h-px flex-1 ' + (done ? 'bg-primary/40' : 'bg-border')}
+                    aria-hidden="true"
                   />
-                </div>
+                ) : null}
               </div>
-              <div>
-                <label className="text-sm font-medium block mb-1">장소/링크</label>
-                <input
-                  className="w-full border rounded-md px-3 py-2 text-sm"
-                  value={interviewForm.location}
-                  onChange={(e) => setInterviewForm((f) => ({ ...f, location: e.target.value }))}
-                />
-              </div>
-              <Button type="submit" size="sm">면접 예약</Button>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+            );
+          })}
+        </div>
 
-      {/* 면접 목록 */}
-      {interviews.length > 0 && (
-        <Card className="mb-6">
-          <CardHeader><CardTitle className="text-lg">면접 ({interviews.length})</CardTitle></CardHeader>
-          <CardContent className="space-y-3">
-            {interviews.map((interview) => (
-              <div key={interview.id} className="p-3 border rounded-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-sm">
-                      {interview.round}차 면접 ({interview.interview_type || '미정'})
-                    </p>
-                    {interview.scheduled_at && (
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(interview.scheduled_at).toLocaleString('ko-KR')}
-                      </p>
-                    )}
-                  </div>
-                  <span className={`px-2 py-0.5 text-xs rounded-full ${
-                    interview.status === 'completed' ? 'bg-green-100 text-green-700' :
-                    interview.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                    'bg-blue-100 text-blue-700'
-                  }`}>
-                    {interview.status === 'scheduled' ? '예정' : interview.status === 'completed' ? '완료' : interview.status}
-                  </span>
-                </div>
-                {interview.evaluations && interview.evaluations.length > 0 && (
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    평가 {interview.evaluations.length}건
-                  </div>
-                )}
+        <div className="mt-4 flex flex-wrap items-end gap-3">
+          <Field label="단계 변경" htmlFor="stage-select" className="min-w-[12rem] flex-1">
+            <Select
+              id="stage-select"
+              value=""
+              disabled={busy === 'stage'}
+              onChange={(e) => {
+                if (e.target.value) handleStageChange(e.target.value);
+              }}
+            >
+              <option value="">선택…</option>
+              {STAGES.filter((s) => s !== stage).map((s) => (
+                <option key={s} value={s}>{STAGE_LABELS[s]}</option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+      </section>
+
+      {/* 적합도 */}
+      {fit ? (
+        <section className="mt-4 rounded-card border border-border bg-card px-pad-i py-pad-b">
+          <h2 className="mb-3 text-h4">적합도</h2>
+          <FitScore fit={fit} />
+        </section>
+      ) : null}
+
+      {/* 되돌릴 수 없는 동작 */}
+      <section className="mt-4 flex flex-col gap-3 rounded-card border border-border bg-card px-pad-i py-pad-b">
+        <h2 className="text-h4">전형 진행</h2>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowInterviewForm((v) => !v)}
+          >
+            {showInterviewForm ? '면접 예약 닫기' : '면접 예약'}
+          </Button>
+
+          {confirming === 'offer' ? (
+            <span className="flex items-center gap-2 rounded-control bg-warn-soft px-3 py-1.5">
+              <span className="text-tiny text-warn">후보자에게 오퍼 알림이 갑니다</span>
+              <Button size="sm" loading={busy === 'offer'} onClick={handleOffer}>
+                보내기
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setConfirming(null)}>
+                취소
+              </Button>
+            </span>
+          ) : (
+            <Button size="sm" variant="outline" onClick={() => setConfirming('offer')}>
+              오퍼 보내기
+            </Button>
+          )}
+
+          {confirming === 'hire' ? (
+            <span className="flex items-center gap-2 rounded-control bg-ok-soft px-3 py-1.5">
+              <span className="text-tiny text-ok">확정하면 되돌릴 수 없습니다</span>
+              <Button size="sm" loading={busy === 'hire'} onClick={handleHire}>
+                확정
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setConfirming(null)}>
+                취소
+              </Button>
+            </span>
+          ) : (
+            <Button size="sm" onClick={() => setConfirming('hire')}>
+              채용 확정
+            </Button>
+          )}
+        </div>
+
+        {showInterviewForm ? (
+          <form
+            onSubmit={handleScheduleInterview}
+            className="anim-rise flex flex-col gap-4 border-t border-border pt-4"
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="면접 유형" htmlFor="interview_type">
+                <Select
+                  id="interview_type"
+                  value={interviewForm.interview_type}
+                  onChange={(e) =>
+                    setInterviewForm((f) => ({ ...f, interview_type: e.target.value }))
+                  }
+                >
+                  {Object.entries(INTERVIEW_TYPE).map(([k, v]) => (
+                    <option key={k} value={k}>{v}</option>
+                  ))}
+                </Select>
+              </Field>
+
+              <Field label="일시" htmlFor="scheduled_at" required>
+                <Input
+                  id="scheduled_at"
+                  type="datetime-local"
+                  value={interviewForm.scheduled_at}
+                  onChange={(e) =>
+                    setInterviewForm((f) => ({ ...f, scheduled_at: e.target.value }))
+                  }
+                  required
+                />
+              </Field>
+            </div>
+
+            <Field label="장소 또는 링크" htmlFor="location">
+              <Input
+                id="location"
+                value={interviewForm.location}
+                onChange={(e) => setInterviewForm((f) => ({ ...f, location: e.target.value }))}
+                placeholder="회의실 3층 / https://meet…"
+              />
+            </Field>
+
+            <Button type="submit" size="sm" loading={busy === 'interview'} className="self-start">
+              {interviews.length + 1}차 면접 예약
+            </Button>
+          </form>
+        ) : null}
+      </section>
+
+      {/* 면접 */}
+      {interviews.length > 0 ? (
+        <section className="mt-4 flex flex-col gap-2 rounded-card border border-border bg-card px-pad-i py-pad-b">
+          <h2 className="mb-1 text-h4">면접 {interviews.length}건</h2>
+          {interviews.map((iv) => (
+            <div
+              key={iv.id}
+              className="flex items-center justify-between gap-3 rounded-control border border-border px-3.5 py-3"
+            >
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <p className="text-small font-medium">
+                  {iv.round ?? '?'}차 · {INTERVIEW_TYPE[iv.interview_type ?? ''] ?? '유형 미정'}
+                </p>
+                {iv.scheduled_at ? (
+                  <p className="text-tiny text-muted-foreground tnum">
+                    {new Date(iv.scheduled_at).toLocaleString('ko-KR')}
+                  </p>
+                ) : null}
               </div>
-            ))}
-          </CardContent>
-        </Card>
-      )}
+              <div className="flex shrink-0 items-center gap-2">
+                {iv.evaluations && iv.evaluations.length > 0 ? (
+                  <span className="text-micro text-muted-foreground">
+                    평가 {iv.evaluations.length}건
+                  </span>
+                ) : null}
+                <Badge
+                  tone={
+                    iv.status === 'completed' ? 'ok' : iv.status === 'cancelled' ? 'danger' : 'info'
+                  }
+                  size="sm"
+                >
+                  {iv.status === 'scheduled'
+                    ? '예정'
+                    : iv.status === 'completed'
+                      ? '완료'
+                      : iv.status === 'cancelled'
+                        ? '취소'
+                        : (iv.status ?? '—')}
+                </Badge>
+              </div>
+            </div>
+          ))}
+        </section>
+      ) : null}
 
       {/* 내부 메모 */}
-      <Card>
-        <CardHeader><CardTitle className="text-lg">내부 메모</CardTitle></CardHeader>
-        <CardContent>
-          <div className="flex gap-2 mb-4">
-            <input
-              className="flex-1 border rounded-md px-3 py-2 text-sm"
-              placeholder="메모를 입력하세요..."
-              value={newNote}
-              onChange={(e) => setNewNote(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAddNote(); }}
-            />
-            <Button size="sm" onClick={handleAddNote}>추가</Button>
-          </div>
-          <div className="space-y-3">
+      <section className="mt-4 flex flex-col gap-4 rounded-card border border-border bg-card px-pad-i py-pad-b">
+        <div>
+          <h2 className="text-h4">내부 메모</h2>
+          <p className="mt-1 text-tiny text-muted-foreground">
+            후보자에게는 보이지 않습니다. 평가 근거를 남겨두면 나중에 설명 요구에 대응할 수 있습니다.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Textarea
+            rows={2}
+            placeholder="예: 2차 면접에서 협업 사례를 구체적으로 설명함"
+            value={newNote}
+            onChange={(e) => setNewNote(e.target.value)}
+            aria-label="새 메모"
+          />
+          <Button
+            size="sm"
+            className="self-end"
+            disabled={!newNote.trim()}
+            loading={busy === 'note'}
+            onClick={handleAddNote}
+          >
+            메모 추가
+          </Button>
+        </div>
+
+        {notes.length === 0 ? (
+          <p className="rounded-control bg-sunk px-3.5 py-3 text-tiny text-muted-foreground">
+            아직 메모가 없습니다.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
             {notes.map((note) => (
-              <div key={note.id} className="p-3 bg-muted/50 rounded-lg">
-                <p className="text-sm">{note.content}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {note.company_members?.name || '담당자'} · {new Date(note.created_at).toLocaleString('ko-KR')}
+              <div key={note.id} className="rounded-control bg-sunk px-3.5 py-3">
+                <p className="whitespace-pre-wrap text-small">{note.content}</p>
+                <p className="mt-1.5 text-micro text-muted-foreground">
+                  {note.company_members?.name || '담당자'} ·{' '}
+                  {new Date(note.created_at).toLocaleString('ko-KR')}
                 </p>
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </section>
     </div>
   );
 }

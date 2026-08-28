@@ -61,6 +61,60 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // 표면 단계 — globals.css의 --sunk / --raised
+        sunk: 'hsl(var(--sunk))',
+        raised: 'hsl(var(--raised))',
+        'border-strong': 'hsl(var(--border-strong))',
+        // 의미 색 — 상태
+        ok: {
+          DEFAULT: 'hsl(var(--ok))',
+          soft: 'hsl(var(--ok-soft))',
+        },
+        warn: {
+          DEFAULT: 'hsl(var(--warn))',
+          soft: 'hsl(var(--warn-soft))',
+        },
+        danger: {
+          DEFAULT: 'hsl(var(--danger))',
+          soft: 'hsl(var(--danger-soft))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          soft: 'hsl(var(--info-soft))',
+        },
+        // 원색 스케일
+        signal: {
+          50: 'hsl(var(--signal-50))',
+          100: 'hsl(var(--signal-100))',
+          200: 'hsl(var(--signal-200))',
+          300: 'hsl(var(--signal-300))',
+          400: 'hsl(var(--signal-400))',
+          500: 'hsl(var(--signal-500))',
+          600: 'hsl(var(--signal-600))',
+          700: 'hsl(var(--signal-700))',
+          800: 'hsl(var(--signal-800))',
+          900: 'hsl(var(--signal-900))',
+        },
+        ember: {
+          300: 'hsl(var(--ember-300))',
+          400: 'hsl(var(--ember-400))',
+          500: 'hsl(var(--ember-500))',
+          600: 'hsl(var(--ember-600))',
+        },
+        ink: {
+          0: 'hsl(var(--ink-0))',
+          50: 'hsl(var(--ink-50))',
+          100: 'hsl(var(--ink-100))',
+          200: 'hsl(var(--ink-200))',
+          300: 'hsl(var(--ink-300))',
+          400: 'hsl(var(--ink-400))',
+          500: 'hsl(var(--ink-500))',
+          600: 'hsl(var(--ink-600))',
+          700: 'hsl(var(--ink-700))',
+          800: 'hsl(var(--ink-800))',
+          900: 'hsl(var(--ink-900))',
+          950: 'hsl(var(--ink-950))',
+        },
         // Ability category colors
         'cat-mental': 'hsl(var(--cat-mental))',
         'cat-social': 'hsl(var(--cat-social))',
@@ -78,6 +132,50 @@ const config: Config = {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        // 모드가 바꾸는 곡률 — play는 더 둥글고 ops는 각지다
+        card: 'var(--radius-card)',
+        control: 'var(--radius-control)',
+        pill: 'var(--radius-pill)',
+      },
+
+      // 타이포 스케일 — 1.22 비율. globals.css의 --fs-* 와 1:1
+      fontSize: {
+        micro: ['var(--fs-micro)', { lineHeight: '1.45' }],
+        tiny: ['var(--fs-tiny)', { lineHeight: '1.5' }],
+        small: ['var(--fs-small)', { lineHeight: '1.55' }],
+        body: ['var(--fs-body)', { lineHeight: '1.65' }],
+        lead: ['var(--fs-lead)', { lineHeight: '1.6' }],
+        h4: ['var(--fs-h4)', { lineHeight: '1.35', letterSpacing: '-0.014em' }],
+        h3: ['var(--fs-h3)', { lineHeight: '1.3', letterSpacing: '-0.017em' }],
+        h2: ['var(--fs-h2)', { lineHeight: '1.25', letterSpacing: '-0.019em' }],
+        h1: ['var(--fs-h1)', { lineHeight: '1.18', letterSpacing: '-0.022em' }],
+        display: ['var(--fs-display)', { lineHeight: '1.06', letterSpacing: '-0.028em' }],
+      },
+
+      // 밀도 — 모드가 바꾸는 단일 손잡이
+      spacing: {
+        'pad-i': 'var(--pad-inline)',
+        'pad-b': 'var(--pad-block)',
+        row: 'var(--row-h)',
+      },
+
+      // 고도 — e1/e2/e3. 모드에 따라 자동으로 바뀐다
+      boxShadow: {
+        e1: 'var(--shadow-1)',
+        e2: 'var(--shadow-2)',
+        e3: 'var(--shadow-3)',
+        glow: 'var(--glow)',
+      },
+
+      transitionTimingFunction: {
+        std: 'var(--ease)',
+        'out-back': 'var(--ease-out-back)',
+      },
+
+      transitionDuration: {
+        fast: 'var(--dur-fast)',
+        std: 'var(--dur)',
+        slow: 'var(--dur-slow)',
       },
       keyframes: {
         'accordion-down': {

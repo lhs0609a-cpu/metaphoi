@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Field } from '@/components/ui/field';
+import { ErrorState } from '@/components/ui/states';
+import { LogoMark } from '@/components/layouts/logo';
 import { useCompanyAuthStore } from '@/lib/company-auth';
 
 export default function CompanyLoginPage() {
@@ -28,56 +31,62 @@ export default function CompanyLoginPage() {
     if (result.success) {
       router.push('/company/dashboard');
     } else {
-      setError(result.error || '로그인에 실패했습니다.');
+      setError(result.error || '이메일 또는 비밀번호가 일치하지 않습니다.');
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-md">
-      <Card>
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl">기업 로그인</CardTitle>
-          <CardDescription>채용 대시보드에 접속하세요</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium block mb-1">이메일</label>
-              <input
-                type="email"
-                className="w-full border rounded-md px-3 py-2 text-sm"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+    <div className="mx-auto flex w-full max-w-sm flex-col gap-7 py-12">
+      <header className="flex flex-col items-center gap-3 text-center">
+        <span className="flex h-11 w-11 items-center justify-center rounded-card bg-primary/12">
+          <LogoMark className="h-6 w-6 text-primary" />
+        </span>
+        <div className="flex flex-col gap-1">
+          <h1 className="text-h2">기업 로그인</h1>
+          <p className="text-small text-muted-foreground">채용 대시보드로 이동합니다</p>
+        </div>
+      </header>
 
-            <div>
-              <label className="text-sm font-medium block mb-1">비밀번호</label>
-              <input
-                type="password"
-                className="w-full border rounded-md px-3 py-2 text-sm"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+      {error ? <ErrorState title="로그인하지 못했습니다" detail={error} /> : null}
 
-            {error && (
-              <p className="text-sm text-destructive">{error}</p>
-            )}
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <Field label="이메일" htmlFor="company-email" required>
+          <Input
+            id="company-email"
+            type="email"
+            autoComplete="email"
+            placeholder="hr@company.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Field>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? '로그인 중...' : '로그인'}
-            </Button>
-          </form>
+        <Field label="비밀번호" htmlFor="company-password" required>
+          <Input
+            id="company-password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </Field>
 
-          <p className="text-center text-sm text-muted-foreground mt-4">
-            계정이 없으신가요?{' '}
-            <Link href="/company/register" className="text-primary hover:underline">기업 가입</Link>
-          </p>
-        </CardContent>
-      </Card>
+        <Button type="submit" size="lg" block loading={loading} className="mt-2">
+          로그인
+        </Button>
+      </form>
+
+      <p className="text-center text-small text-muted-foreground">
+        계정이 없으신가요?{' '}
+        <Link
+          href="/company/register"
+          className="font-medium text-primary underline-offset-4 hover:underline"
+        >
+          기업 가입
+        </Link>
+      </p>
     </div>
   );
 }
