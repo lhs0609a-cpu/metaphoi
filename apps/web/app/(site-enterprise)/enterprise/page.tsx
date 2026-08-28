@@ -223,7 +223,7 @@ export default function EnterprisePage() {
                 <Link href={plan.id === 'enterprise' ? 'mailto:enterprise@metaphoi.com' : '/company/register'}>
                   <Button
                     className="w-full mt-6"
-                    variant={plan.recommended ? 'default' : 'outline'}
+                    variant={plan.recommended ? 'primary' : 'outline'}
                   >
                     {plan.id === 'enterprise' ? '문의하기' : '기업 가입'}
                   </Button>

@@ -219,7 +219,7 @@ export default function DashboardPage() {
                       </ul>
                       <Link href="/checkout?testCode=comprehensive">
                         <Button
-                          variant={plan.recommended ? 'default' : 'outline'}
+                          variant={plan.recommended ? 'primary' : 'outline'}
                           className="w-full"
                           disabled={!hasComprehensive}
                         >

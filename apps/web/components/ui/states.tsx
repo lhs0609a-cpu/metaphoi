@@ -74,13 +74,22 @@ interface EmptyStateProps {
   /** 24×24 뷰박스 SVG를 기대한다. 없으면 아이콘 자리 자체를 비운다 */
   icon?: React.ReactNode;
   action?: EmptyAction;
+  /** 보조 경로. 주 동작과 나란히, 한 단계 낮은 무게로 놓는다 */
+  secondaryAction?: EmptyAction;
   className?: string;
 }
 
 /**
  * 비어 있음은 실패가 아니다. 무엇이 없는지와 다음에 뭘 할 수 있는지를 같이 말한다.
  */
-export function EmptyState({ title, description, icon, action, className }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  icon,
+  action,
+  secondaryAction,
+  className,
+}: EmptyStateProps) {
   return (
     <div
       className={cn(
@@ -103,18 +112,35 @@ export function EmptyState({ title, description, icon, action, className }: Empt
         ) : null}
       </div>
 
-      {action ? (
-        action.href ? (
-          <Button asChild size="sm" variant="outline" className="mt-1">
-            <Link href={action.href}>{action.label}</Link>
-          </Button>
-        ) : (
-          <Button size="sm" variant="outline" className="mt-1" onClick={action.onClick}>
-            {action.label}
-          </Button>
-        )
+      {action || secondaryAction ? (
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-2">
+          {action ? <ActionButton action={action} variant="outline" /> : null}
+          {secondaryAction ? <ActionButton action={secondaryAction} variant="ghost" /> : null}
+        </div>
       ) : null}
     </div>
+  );
+}
+
+/** href면 링크로, onClick이면 버튼으로 — 부르는 쪽이 둘 중 하나만 주면 된다 */
+function ActionButton({
+  action,
+  variant,
+}: {
+  action: EmptyAction;
+  variant: 'outline' | 'ghost';
+}) {
+  if (action.href) {
+    return (
+      <Button asChild size="sm" variant={variant}>
+        <Link href={action.href}>{action.label}</Link>
+      </Button>
+    );
+  }
+  return (
+    <Button size="sm" variant={variant} onClick={action.onClick}>
+      {action.label}
+    </Button>
   );
 }
 

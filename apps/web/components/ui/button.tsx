@@ -37,15 +37,20 @@ export interface ButtonProps
   asChild?: boolean;
   /** 진행 중. 스피너를 붙이고 버튼을 잠근다 — 같은 요청이 두 번 나가지 않게 */
   loading?: boolean;
+  /** 가로 전체. 폼 제출처럼 다음 동작이 하나뿐일 때 */
+  block?: boolean;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, loading = false, disabled, children, ...props }, ref) => {
+  (
+    { className, variant, size, asChild = false, loading = false, block, disabled, children, ...props },
+    ref
+  ) => {
     const Comp = asChild ? Slot : 'button';
 
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size }), className)}
+        className={cn(buttonVariants({ variant, size }), block && 'w-full', className)}
         ref={ref}
         disabled={asChild ? undefined : disabled || loading}
         aria-busy={loading || undefined}
