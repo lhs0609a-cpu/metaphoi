@@ -168,7 +168,7 @@ export default function ComprehensiveResultPreview() {
                     style={{ backgroundColor: d.color }}
                   />
                   {d.name}
-                  <span className="font-mono-stat font-bold">{d.score}</span>
+                  <span className="stat-num font-bold">{d.score}</span>
                 </span>
               ))}
             </div>
@@ -436,7 +436,7 @@ export default function ComprehensiveResultPreview() {
                   <div className="space-y-2">
                     {profile.summary.careers.map((career, i) => (
                       <div key={career} className="flex items-center gap-3">
-                        <span className="text-sm font-mono-stat font-bold text-primary w-6">{i + 1}</span>
+                        <span className="text-sm stat-num font-bold text-primary w-6">{i + 1}</span>
                         <span className="text-sm">{career}</span>
                       </div>
                     ))}

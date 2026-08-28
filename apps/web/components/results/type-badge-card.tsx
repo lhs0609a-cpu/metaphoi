@@ -30,7 +30,7 @@ export function TypeBadgeCard({
       `}
     >
       <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <p className={`text-2xl font-mono-stat font-bold ${colors?.textClass ?? 'text-primary'}`}>
+      <p className={`text-2xl stat-num font-bold ${colors?.textClass ?? 'text-primary'}`}>
         {value}
       </p>
       {sub && (

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { type TestType, getTestTypeInfoByType } from '@/lib/question-utils';
+import { type TestType } from '@/lib/question-utils';
 
 interface MilestoneFeedbackProps {
   message: string;
@@ -12,6 +12,13 @@ interface MilestoneFeedbackProps {
   onContinue: () => void;
 }
 
+/**
+ * 구간을 통과할 때 잠깐 뜨는 알림.
+ *
+ * "Level Up!" 같은 말과 트로피 아이콘을 쓰지 않는다. 여기서 하려는 일은
+ * 축하가 아니라 "얼마나 왔는지" 알려주고 흐름을 끊지 않는 것이다.
+ * 2.5초 뒤 저절로 닫히므로 읽을 것은 한 줄이면 충분하다.
+ */
 export function MilestoneFeedback({
   message,
   progress,
@@ -19,66 +26,47 @@ export function MilestoneFeedback({
   testsRemaining,
   onContinue,
 }: MilestoneFeedbackProps) {
-  const [autoClose, setAutoClose] = useState(false);
+  const [closed, setClosed] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setAutoClose(true);
+      setClosed(true);
       onContinue();
     }, 2500);
     return () => clearTimeout(timer);
   }, [onContinue]);
 
-  if (autoClose) return null;
-
-  const typeInfo = testCompleted ? getTestTypeInfoByType(testCompleted) : null;
+  if (closed) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
-      <div className="animate-rank-reveal mx-4 w-full max-w-sm rounded-2xl border bg-card p-8 shadow-lg text-center">
-        {/* Icon */}
-        <div className={`w-14 h-14 rounded-xl flex items-center justify-center mx-auto mb-4 ${
-          typeInfo ? `${typeInfo.bgClass}` : 'bg-primary/10'
-        }`}>
-          {testCompleted ? (
-            <svg className={`w-7 h-7 ${typeInfo?.textClass ?? 'text-primary'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          ) : (
-            <svg className="w-7 h-7 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
-          )}
-        </div>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-foreground/20 p-4 backdrop-blur-[2px] sm:items-center"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="anim-rise w-full max-w-sm rounded-card border border-border bg-card p-6 shadow-e3">
+        {testCompleted ? <p className="eyebrow">검사 하나 통과</p> : <p className="eyebrow">진행 상황</p>}
 
-        {testCompleted && (
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
-            Level Up!
-          </p>
-        )}
-        <p className="text-lg font-semibold mb-3">{message}</p>
+        <p className="mt-2 text-h4">{message}</p>
 
-        {/* Progress bar */}
-        <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden mb-2">
+        <div className="sunk mt-5 h-1.5 overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${
-              typeInfo
-                ? `bg-gradient-to-r ${typeInfo.bgClass.replace('bg-', 'from-').replace('/30', '')} to-primary`
-                : 'bg-primary'
-            }`}
+            className="h-full rounded-pill bg-action transition-[width] duration-std ease-std"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-sm text-muted-foreground mb-5 font-mono-stat">
-          {progress}% 완료
+
+        <p className="mt-2 text-tiny text-muted-foreground">
+          <span className="stat-num" data-numeric>
+            {progress}%
+          </span>{' '}
+          완료
           {testsRemaining != null && testsRemaining > 0 && (
-            <span className="ml-2">
-              | {5 - testsRemaining}/5 검사 통과
-            </span>
+            <> · 검사 {5 - testsRemaining} / 5 통과</>
           )}
         </p>
 
-        <Button onClick={onContinue} className="w-full">
+        <Button block className="mt-5" onClick={onContinue}>
           계속하기
         </Button>
       </div>

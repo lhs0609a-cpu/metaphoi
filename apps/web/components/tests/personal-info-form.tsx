@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Field, Select } from '@/components/ui/field';
+import { Segmented } from '@/components/ui/segmented';
 import { type PersonalInfo } from '@/data/tests/comprehensive';
 
 interface PersonalInfoFormProps {
@@ -22,6 +22,18 @@ const HOUR_OPTIONS = [
   '오시 (11:00~13:00)', '미시 (13:00~15:00)', '신시 (15:00~17:00)',
   '유시 (17:00~19:00)', '술시 (19:00~21:00)', '해시 (21:00~23:00)',
 ];
+
+const GENDERS = [
+  { value: '남', label: '남성' },
+  { value: '여', label: '여성' },
+] as const;
+
+const BLOOD_TYPES = [
+  { value: 'A', label: 'A형' },
+  { value: 'B', label: 'B형' },
+  { value: 'O', label: 'O형' },
+  { value: 'AB', label: 'AB형' },
+] as const;
 
 export function PersonalInfoForm({ initialData, onSubmit }: PersonalInfoFormProps) {
   const [name, setName] = useState(initialData?.name || '');
@@ -41,125 +53,87 @@ export function PersonalInfoForm({ initialData, onSubmit }: PersonalInfoFormProp
   const daysInMonth = new Date(birthYear, birthMonth, 0).getDate();
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">기본 정보</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            정확한 분석을 위해 기본 정보를 입력해주세요
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-5">
-          {/* 이름 */}
-          <div className="space-y-2">
-            <Label htmlFor="name">이름</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="이름을 입력하세요"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              maxLength={20}
-            />
-          </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+      <div className="flex flex-col gap-6 rounded-card border border-border p-6 sm:p-7">
+        <Field label="이름" htmlFor="name" hint="결과 화면에 표시됩니다. 실명이 아니어도 됩니다" required>
+          <Input
+            id="name"
+            type="text"
+            placeholder="어떻게 부를까요"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            maxLength={20}
+            autoComplete="name"
+          />
+        </Field>
 
-          {/* 생년월일 */}
-          <div className="space-y-2">
-            <Label>생년월일</Label>
-            <div className="grid grid-cols-3 gap-3">
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={birthYear}
-                onChange={(e) => setBirthYear(Number(e.target.value))}
-              >
-                {years.map((y) => (
-                  <option key={y} value={y}>{y}년</option>
-                ))}
-              </select>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={birthMonth}
-                onChange={(e) => setBirthMonth(Number(e.target.value))}
-              >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                  <option key={m} value={m}>{m}월</option>
-                ))}
-              </select>
-              <select
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={birthDay}
-                onChange={(e) => setBirthDay(Number(e.target.value))}
-              >
-                {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
-                  <option key={d} value={d}>{d}일</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* 태어난 시간 */}
-          <div className="space-y-2">
-            <Label>태어난 시간</Label>
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={birthHourIdx}
-              onChange={(e) => setBirthHourIdx(Number(e.target.value))}
+        <Field label="생년월일" htmlFor="birth-year" required>
+          <div className="grid grid-cols-3 gap-2">
+            <Select
+              id="birth-year"
+              aria-label="태어난 해"
+              value={birthYear}
+              onChange={(e) => setBirthYear(Number(e.target.value))}
             >
-              {HOUR_OPTIONS.map((label, i) => (
-                <option key={i} value={i}>{label}</option>
+              {years.map((y) => (
+                <option key={y} value={y}>{y}년</option>
               ))}
-            </select>
-            <p className="text-xs text-muted-foreground">사주 분석에 활용됩니다. 모르면 &apos;모름&apos;을 선택하세요.</p>
-          </div>
-
-          {/* 성별 */}
-          <div className="space-y-2">
-            <Label>성별</Label>
-            <div className="flex gap-3">
-              {(['남', '여'] as const).map((g) => (
-                <button
-                  key={g}
-                  type="button"
-                  className={`flex-1 h-10 rounded-md border text-sm font-medium transition-colors ${
-                    gender === g
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-input hover:border-primary/50'
-                  }`}
-                  onClick={() => setGender(g)}
-                >
-                  {g === '남' ? '남성' : '여성'}
-                </button>
+            </Select>
+            <Select
+              aria-label="태어난 달"
+              value={birthMonth}
+              onChange={(e) => setBirthMonth(Number(e.target.value))}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>{m}월</option>
               ))}
-            </div>
-          </div>
-
-          {/* 혈액형 */}
-          <div className="space-y-2">
-            <Label>혈액형</Label>
-            <div className="flex gap-3">
-              {(['A', 'B', 'O', 'AB'] as const).map((bt) => (
-                <button
-                  key={bt}
-                  type="button"
-                  className={`flex-1 h-10 rounded-md border text-sm font-medium transition-colors ${
-                    bloodType === bt
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-input hover:border-primary/50'
-                  }`}
-                  onClick={() => setBloodType(bt)}
-                >
-                  {bt}형
-                </button>
+            </Select>
+            <Select
+              aria-label="태어난 날"
+              value={birthDay}
+              onChange={(e) => setBirthDay(Number(e.target.value))}
+            >
+              {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>{d}일</option>
               ))}
-            </div>
+            </Select>
           </div>
-        </CardContent>
-      </Card>
+        </Field>
 
-      <Button type="submit" size="lg" className="w-full text-lg py-6" disabled={!name.trim()}>
-        검사 시작하기
-      </Button>
+        <Field
+          label="태어난 시간"
+          htmlFor="birth-hour"
+          hint="사주 계산에만 씁니다. 모르면 '모름'으로 두세요 — 나머지 분석에는 영향이 없습니다"
+        >
+          <Select
+            id="birth-hour"
+            value={birthHourIdx}
+            onChange={(e) => setBirthHourIdx(Number(e.target.value))}
+          >
+            {HOUR_OPTIONS.map((label, i) => (
+              <option key={i} value={i}>{label}</option>
+            ))}
+          </Select>
+        </Field>
+
+        <Field label="성별" hint="사주와 사상체질 계산에 필요합니다">
+          <Segmented options={GENDERS} value={gender} onChange={setGender} aria-label="성별" />
+        </Field>
+
+        <Field label="혈액형" hint="보조 지표로만 반영됩니다">
+          <Segmented options={BLOOD_TYPES} value={bloodType} onChange={setBloodType} aria-label="혈액형" />
+        </Field>
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <Button type="submit" size="lg" block disabled={!name.trim()}>
+          검사 시작하기
+        </Button>
+        <p className="text-center text-tiny text-muted-foreground">
+          입력한 정보는 결과 산출에만 쓰이고, 저장하지 않으면 브라우저를 닫을 때 사라집니다
+        </p>
+      </div>
     </form>
   );
 }

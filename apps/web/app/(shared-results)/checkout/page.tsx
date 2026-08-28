@@ -181,7 +181,7 @@ function CheckoutContent() {
               </span>
             </div>
             <CardTitle className="text-xl">{PLANS[1].name}</CardTitle>
-            <CardDescription className="text-3xl font-bold text-foreground font-mono-stat">
+            <CardDescription className="text-3xl font-bold text-foreground stat-num">
               {PLANS[1].priceLabel}
             </CardDescription>
           </CardHeader>
@@ -271,7 +271,7 @@ function CheckoutContent() {
                         )}
                       </div>
                     </CardTitle>
-                    <CardDescription className="text-xl font-bold text-foreground font-mono-stat">
+                    <CardDescription className="text-xl font-bold text-foreground stat-num">
                       {p.priceLabel}
                     </CardDescription>
                   </CardHeader>

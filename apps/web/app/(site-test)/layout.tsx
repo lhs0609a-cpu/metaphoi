@@ -1,10 +1,11 @@
+import { Surface } from '@/components/layouts/surface';
 import { MinimalHeader } from '@/components/layouts/minimal-header';
 
 export default function SiteTestLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col">
+    <Surface mode="play" className="flex flex-col">
       <MinimalHeader />
-      <div className="flex-1">{children}</div>
-    </div>
+      <main className="flex-1">{children}</main>
+    </Surface>
   );
 }

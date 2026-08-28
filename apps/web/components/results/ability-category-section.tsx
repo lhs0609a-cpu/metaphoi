@@ -33,7 +33,7 @@ export function AbilityCategorySection({
       <div className="flex items-center gap-2 mb-3">
         <h4 className={`text-sm font-bold ${catColor.textClass}`}>{category}</h4>
         <span
-          className={`text-xs font-mono-stat font-bold px-1.5 py-0.5 rounded ${rankCfg.twBg} ${rankCfg.twColor}`}
+          className={`text-xs stat-num font-bold px-1.5 py-0.5 rounded ${rankCfg.twBg} ${rankCfg.twColor}`}
         >
           {avgRank}
         </span>

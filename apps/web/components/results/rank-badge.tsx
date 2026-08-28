@@ -24,7 +24,7 @@ export function RankBadge({ score, size = 'md', animate = true }: RankBadgeProps
         ${SIZE_MAP[size]}
         ${cfg.twBg} ${cfg.twColor} ${cfg.twBorder}
         inline-flex items-center justify-center
-        rounded-lg border-2 font-mono-stat font-black
+        rounded-lg border-2 stat-num font-black
         ${animate ? 'animate-rank-reveal' : ''}
       `}
     >

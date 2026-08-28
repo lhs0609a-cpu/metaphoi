@@ -41,7 +41,7 @@ export function StatBar({
       style={{ animationDelay: `${delay}ms` }}
     >
       {rank != null && (
-        <span className={`font-mono-stat text-xs font-bold w-5 ${rankCfg.twColor}`}>
+        <span className={`stat-num text-xs font-bold w-5 ${rankCfg.twColor}`}>
           {rank}
         </span>
       )}
@@ -57,7 +57,7 @@ export function StatBar({
           } as React.CSSProperties}
         />
       </div>
-      <span className={`font-mono-stat text-sm font-bold w-8 text-right ${rankCfg.twColor}`}>
+      <span className={`stat-num text-sm font-bold w-8 text-right ${rankCfg.twColor}`}>
         {animated ? displayValue : score}
       </span>
     </div>
