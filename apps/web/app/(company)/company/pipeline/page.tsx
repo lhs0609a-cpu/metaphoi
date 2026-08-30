@@ -152,7 +152,7 @@ export default function CompanyPipelinePage() {
                           key={app.id}
                           className={cn(
                             'flex flex-col gap-2 rounded-control border border-border bg-card p-3',
-                            'transition-[border-color,opacity] duration-fast hover:border-primary/45',
+                            'transition-[border-color,opacity] duration-fast hover:border-border-strong',
                             moving === app.id && 'opacity-60',
                           )}
                         >

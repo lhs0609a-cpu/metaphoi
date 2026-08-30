@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field } from '@/components/ui/field';
 import { ErrorState } from '@/components/ui/states';
-import { LogoMark } from '@/components/layouts/logo';
 import { useCompanyAuthStore } from '@/lib/company-auth';
 
 export default function CompanyLoginPage() {
@@ -36,15 +35,10 @@ export default function CompanyLoginPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-sm flex-col gap-7 py-12">
-      <header className="flex flex-col items-center gap-3 text-center">
-        <span className="flex h-11 w-11 items-center justify-center rounded-card bg-primary/12">
-          <LogoMark className="h-6 w-6 text-primary" />
-        </span>
-        <div className="flex flex-col gap-1">
-          <h1 className="text-h2">기업 로그인</h1>
-          <p className="text-small text-muted-foreground">채용 대시보드로 이동합니다</p>
-        </div>
+    <div className="flex w-full max-w-sm flex-col gap-7">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="text-h2">기업 로그인</h1>
+        <p className="text-small text-muted-foreground">채용 대시보드로 이동합니다</p>
       </header>
 
       {error ? <ErrorState title="로그인하지 못했습니다" detail={error} /> : null}

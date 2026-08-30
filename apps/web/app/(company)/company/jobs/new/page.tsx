@@ -242,8 +242,8 @@ export default function NewJobPostingPage() {
                   className={cn(
                     'rounded-pill border px-3 py-1.5 text-tiny font-medium transition-colors duration-fast',
                     on
-                      ? 'border-primary bg-accent text-accent-foreground'
-                      : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground',
+                      ? 'border-action bg-action text-action-foreground'
+                      : 'border-border text-muted-foreground hover:border-border-strong hover:text-foreground',
                   )}
                 >
                   {a.name}
@@ -306,8 +306,8 @@ export default function NewJobPostingPage() {
                   className={cn(
                     'rounded-pill border px-3 py-1.5 text-tiny font-medium transition-colors duration-fast',
                     on
-                      ? 'border-primary bg-accent text-accent-foreground'
-                      : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground',
+                      ? 'border-action bg-action text-action-foreground'
+                      : 'border-border text-muted-foreground hover:border-border-strong hover:text-foreground',
                   )}
                 >
                   {tag}

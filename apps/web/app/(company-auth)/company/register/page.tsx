@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Field, Select } from '@/components/ui/field';
 import { ErrorState } from '@/components/ui/states';
-import { LogoMark } from '@/components/layouts/logo';
 import { useCompanyAuthStore } from '@/lib/company-auth';
 
 const SIZE_RANGES = ['1-10', '11-50', '51-200', '201-1000', '1000+'];
@@ -78,17 +77,10 @@ export default function CompanyRegisterPage() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-lg flex-col gap-7 py-10">
-      <header className="flex flex-col items-center gap-3 text-center">
-        <span className="flex h-11 w-11 items-center justify-center rounded-card bg-primary/12">
-          <LogoMark className="h-6 w-6 text-primary" />
-        </span>
-        <div className="flex flex-col gap-1">
-          <h1 className="text-h2">기업 가입</h1>
-          <p className="text-small text-muted-foreground">
-            공고를 올리고 능력치 기준으로 후보를 찾을 수 있습니다.
-          </p>
-        </div>
+    <div className="flex w-full max-w-lg flex-col gap-7">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="text-h2">기업 가입</h1>
+        <p className="text-small text-muted-foreground">공고를 올리고 능력치 기준으로 후보를 찾을 수 있습니다.</p>
       </header>
 
       {error ? <ErrorState title="가입하지 못했습니다" detail={error} /> : null}

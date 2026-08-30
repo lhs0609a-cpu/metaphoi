@@ -192,7 +192,7 @@ export default function CompanyDashboardPage() {
             <Link
               key={s.href}
               href={s.href}
-              className="group flex flex-col gap-1 rounded-card border border-border bg-card px-4 py-3.5 transition-[border-color,box-shadow] duration-fast hover:border-primary/45 hover:shadow-e2"
+              className="group flex flex-col gap-1 rounded-card border border-border bg-card px-4 py-3.5 transition-[border-color,box-shadow] duration-fast hover:border-border-strong hover:shadow-e2"
             >
               <span className="flex items-center justify-between text-body font-semibold">
                 {s.title}

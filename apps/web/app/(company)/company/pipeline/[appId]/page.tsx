@@ -242,7 +242,7 @@ export default function ApplicationDetailPage() {
                 </span>
                 {i < 6 ? (
                   <span
-                    className={'h-px flex-1 ' + (done ? 'bg-primary/40' : 'bg-border')}
+                    className={'h-px flex-1 ' + (done ? 'bg-foreground/30' : 'bg-border')}
                     aria-hidden="true"
                   />
                 ) : null}

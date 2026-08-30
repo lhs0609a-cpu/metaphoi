@@ -150,7 +150,7 @@ export default function JobDetailPage() {
                     <span className="w-20 shrink-0 text-small">{ABILITY_LABELS[key] ?? key}</span>
                     <span className="relative h-1.5 flex-1 overflow-hidden rounded-pill bg-secondary">
                       <span
-                        className="absolute inset-y-0 left-0 rounded-pill bg-primary/30"
+                        className="absolute inset-y-0 left-0 rounded-pill bg-foreground/20"
                         style={{ width: `${val.min}%` }}
                       />
                       <span
