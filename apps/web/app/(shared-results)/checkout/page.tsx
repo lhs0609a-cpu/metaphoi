@@ -211,7 +211,7 @@ function CheckoutContent() {
             )}
 
             <Button
-              className="w-full text-lg py-6 relative overflow-hidden"
+              block
               size="lg"
               onClick={() => {
                 setSelectedPlan('pro');
@@ -219,10 +219,9 @@ function CheckoutContent() {
               }}
               disabled={loading}
             >
-              <span className="relative z-10">
-                {loading && selectedPlan === 'pro' ? '결제 준비 중...' : `전체 캐릭터 시트 해금 - ${PLANS[1].priceLabel}`}
-              </span>
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shimmer bg-[length:200%_100%]" />
+              {loading && selectedPlan === 'pro'
+                ? '결제 준비 중'
+                : `전체 분석 열기 · ${PLANS[1].priceLabel}`}
             </Button>
 
             <p className="text-xs text-muted-foreground text-center mt-3">

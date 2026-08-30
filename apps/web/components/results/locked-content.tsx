@@ -1,43 +1,45 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 interface LockedContentProps {
   title: string;
   items?: string[];
 }
 
+/**
+ * 잠긴 섹션.
+ *
+ * 내용을 흐릿하게 깔아 두고 "보일 듯 말 듯" 하게 만들지 않는다.
+ * 무엇이 들어 있는지 글자로 정확히 적는 편이 결제 판단에 도움이 되고,
+ * 흐린 글자를 눈으로 해독하려는 헛수고를 시키지 않는다.
+ */
 export function LockedContent({ title, items }: LockedContentProps) {
-  const placeholderItems = items || [
-    '이 영역의 분석 결과가 여기에 표시됩니다.',
-    '상세한 해석과 설명을 확인할 수 있습니다.',
-    '개인화된 추천사항이 제공됩니다.',
-  ];
+  const listed = items ?? ['상세 해석', '개인화된 추천', '실행 가이드'];
 
   return (
-    <Card className="overflow-hidden border-dashed">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-          </svg>
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2.5">
-          {placeholderItems.map((item, i) => (
-            <div key={i} className="flex items-start gap-2.5">
-              <div className="w-5 h-5 rounded bg-muted flex items-center justify-center shrink-0 mt-0.5">
-                <svg className="w-3 h-3 text-muted-foreground/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-              <p className="text-sm text-muted-foreground/50 blur-[3px] select-none">{item}</p>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-card border border-dashed border-border px-5 py-4">
+      <div className="flex items-center gap-2">
+        <svg
+          className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          aria-hidden="true"
+        >
+          <rect x="3.25" y="7" width="9.5" height="6.25" rx="1.5" />
+          <path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2" />
+        </svg>
+        <h3 className="text-body font-semibold">{title}</h3>
+      </div>
+
+      <ul className="mt-3 flex flex-col gap-1.5">
+        {listed.map((item) => (
+          <li key={item} className="flex items-start gap-2 text-small text-muted-foreground">
+            <span className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-current opacity-50" />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

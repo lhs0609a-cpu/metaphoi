@@ -29,16 +29,20 @@ export function AbilityCategorySection({
   const rankCfg = RANK_CONFIG[avgRank];
 
   return (
-    <div ref={ref} className={`border-l-4 pl-4 ${catColor.borderClass}`}>
-      <div className="flex items-center gap-2 mb-3">
-        <h4 className={`text-sm font-bold ${catColor.textClass}`}>{category}</h4>
+    <div ref={ref}>
+      {/* 카테고리 색은 왼쪽 점 하나로 충분하다. 굵은 세로선은 목록을 격자로 만든다 */}
+      <div className="mb-3 flex items-center gap-2">
         <span
-          className={`text-xs stat-num font-bold px-1.5 py-0.5 rounded ${rankCfg.twBg} ${rankCfg.twColor}`}
-        >
+          className="h-2 w-2 shrink-0 rounded-full"
+          style={{ backgroundColor: `hsl(${catColor.hsl})` }}
+          aria-hidden="true"
+        />
+        <h4 className="text-body font-semibold">{category}</h4>
+        <span className={`stat-num rounded px-1.5 py-0.5 text-micro ${rankCfg.twBg} ${rankCfg.twColor}`}>
           {avgRank}
         </span>
       </div>
-      <div className="space-y-2">
+      <div className="flex flex-col gap-2">
         {isPaid ? (
           abilities.map((ability, i) => (
             <StatBar
@@ -52,35 +56,20 @@ export function AbilityCategorySection({
           ))
         ) : (
           <>
-            {abilities.slice(0, 1).map((ability) => (
+            {abilities.slice(0, 2).map((ability, i) => (
               <StatBar
                 key={ability.key}
                 label={ability.name}
                 score={ability.score}
                 category={category}
                 animated={animate}
+                delay={i * 80}
               />
             ))}
-            {abilities.length > 1 && (
-              <div className="relative">
-                <div className="blur-sm select-none pointer-events-none space-y-2">
-                  {abilities.slice(1).map((ability, i) => (
-                    <StatBar
-                      key={ability.key}
-                      label={ability.name}
-                      score={ability.score}
-                      category={category}
-                      animated={false}
-                      delay={i * 80}
-                    />
-                  ))}
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground bg-background/80 px-3 py-1 rounded-full">
-                    +{abilities.length - 1}개 잠금
-                  </span>
-                </div>
-              </div>
+            {abilities.length > 2 && (
+              <p className="pl-4 pt-1 text-tiny text-muted-foreground">
+                나머지 {abilities.length - 2}개는 전체 분석에서 볼 수 있습니다
+              </p>
             )}
           </>
         )}
