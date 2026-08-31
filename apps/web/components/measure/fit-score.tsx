@@ -1,13 +1,18 @@
 import { cn } from '@/lib/utils';
 
 export interface Fit {
-  total: number;
+  /** 잰 항목이 하나도 없으면 null */
+  total: number | null;
   /** 능력치 적합도 — 가중치 60% */
-  ability?: number;
+  ability?: number | null;
   /** 팀 성향 궁합 — 25% */
-  culture?: number;
+  culture?: number | null;
   /** 근무 조건 일치 — 15% */
-  condition?: number;
+  condition?: number | null;
+  /** 실제로 계산에 쓰인 항목 */
+  measured?: string[];
+  /** 전체 가중치 중 잰 비율 (0~1) */
+  coverage?: number;
 }
 
 /** 가중치는 아직 준거 데이터로 검증되지 않은 설정값이다. 화면에도 그대로 적는다. */
@@ -37,9 +42,23 @@ interface FitScoreProps {
  * 총점 하나만 보이면 사람은 그것을 결론으로 읽는다.
  */
 export function FitScore({ fit, size = 'md', showNote = true, className }: FitScoreProps) {
+  // 잰 항목이 없으면 숫자를 만들어내지 않는다.
+  // 0점과 "못 쟀음"은 완전히 다른 말이다.
+  if (fit.total == null) {
+    return (
+      <div className={cn('flex flex-col gap-1', className)}>
+        <p className="text-small font-semibold text-muted-foreground">적합도 산출 불가</p>
+        <p className="text-tiny leading-relaxed text-muted-foreground">
+          공고의 요구 조건이나 후보자의 측정 결과가 없어 계산하지 못했습니다.
+        </p>
+      </div>
+    );
+  }
+
   const total = Math.round(fit.total);
   const tone = toneOf(total);
   const parts = PARTS.filter((p) => fit[p.key] != null);
+  const missing = PARTS.filter((p) => fit[p.key] == null);
 
   return (
     <div className={cn('flex flex-col gap-2.5', className)}>
@@ -80,6 +99,13 @@ export function FitScore({ fit, size = 'md', showNote = true, className }: FitSc
         </ul>
       ) : null}
 
+      {missing.length > 0 ? (
+        <p className="text-micro leading-relaxed text-muted-foreground">
+          {missing.map((p) => p.label).join('·')} 항목은 측정되지 않아 계산에서 제외했습니다.
+          남은 항목만으로 환산한 점수입니다.
+        </p>
+      ) : null}
+
       {showNote ? (
         <p className="text-micro leading-relaxed text-muted-foreground">
           가중치는 검증 전 설정값입니다. 정렬 참고용으로만 쓰고, 이 점수만으로 불합격을 결정하지 마세요.
@@ -90,12 +116,15 @@ export function FitScore({ fit, size = 'md', showNote = true, className }: FitSc
 }
 
 interface FitScoreInlineProps {
-  total: number;
+  total: number | null;
   className?: string;
 }
 
 /** 리스트 한 줄에 끼워 넣는 축약형. 분해 없이 총점만 — 대신 '참고' 라벨을 떼지 않는다 */
 export function FitScoreInline({ total, className }: FitScoreInlineProps) {
+  if (total == null) {
+    return <span className={cn('text-micro text-muted-foreground', className)}>적합도 미산출</span>;
+  }
   const v = Math.round(total);
   const tone = toneOf(v);
 
