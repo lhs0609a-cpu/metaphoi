@@ -14,17 +14,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { useCompanyAuthStore } from '@/lib/company-auth';
 import { marketplaceApi } from '@/lib/marketplace-api';
 import { cn } from '@/lib/utils';
+import { ABILITY_CATALOG } from '@/lib/abilities-scoring';
+import { RolePicker } from '@/components/company/role-picker';
+import type { ResolvedRole } from '@/lib/role-matching';
 
-const ABILITY_OPTIONS = [
-  { key: 'decisiveness', name: '결단력' }, { key: 'composure', name: '침착성' },
-  { key: 'focus', name: '집중력' }, { key: 'creativity', name: '창의성' },
-  { key: 'analytical', name: '분석력' }, { key: 'adaptability', name: '적응력' },
-  { key: 'communication', name: '소통능력' }, { key: 'teamwork', name: '협동심' },
-  { key: 'leadership', name: '리더십' }, { key: 'empathy', name: '공감능력' },
-  { key: 'influence', name: '영향력' }, { key: 'networking', name: '네트워킹' },
-  { key: 'execution', name: '실행력' }, { key: 'planning', name: '기획력' },
-  { key: 'problem_solving', name: '문제해결' }, { key: 'time_management', name: '시간관리' },
-];
+// 능력치 목록은 lib/abilities-scoring.ts 가 유일한 출처다.
+// 예전에 이 화면이 자체 목록을 들고 있었고 키 5개가 실제와 달라서
+// 능력 적합도(적합도의 60%)가 조용히 무력화돼 있었다.
+const ABILITY_OPTIONS = ABILITY_CATALOG;
 
 const CULTURE_TAGS = [
   '자율출퇴근', '수평문화', '성과중심', '데이터중심', '팀워크중심',
@@ -47,11 +44,16 @@ export default function NewJobPostingPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  // 직무를 골랐을 때 채워진 초안. 제출 시 담당자가 고쳤는지 비교한다 —
+  // 근거의 질(초안 그대로 vs 사람이 검토함)을 기록해 두지 않으면
+  // 나중에 매칭 품질을 따질 때 구분할 방법이 없다.
+  const [abilityDraft, setAbilityDraft] = useState<string>('');
 
   const [form, setForm] = useState({
     title: '',
     description: '',
     team_profile_id: '',
+    role_id: '',
     required_abilities: {} as Record<string, { min: number }>,
     preferred_culture: [] as string[],
     conditions: {
@@ -113,7 +115,12 @@ export default function NewJobPostingPage() {
         title: form.title,
         description: form.description,
         team_profile_id: form.team_profile_id || null,
+        role_id: form.role_id || null,
         required_abilities: abilityCount > 0 ? form.required_abilities : null,
+        required_abilities_source:
+          abilityDraft && JSON.stringify(form.required_abilities) === abilityDraft
+            ? 'provisional'
+            : 'manual',
         preferred_culture: form.preferred_culture.length > 0 ? form.preferred_culture : null,
         conditions: {
           salary_range: form.conditions.salary_range || null,
@@ -207,6 +214,35 @@ export default function NewJobPostingPage() {
               ))}
             </Select>
           </Field>
+        </section>
+
+        {/* 직무 — 요구 능력치보다 먼저 묻는다.
+            무엇을 뽑는지 정하지 않은 채로 능력치부터 고르면
+            담당자가 그 자리에서 직무 정의를 새로 하게 된다 */}
+        <section className="flex flex-col gap-4 rounded-card border border-border bg-card px-pad-i py-pad-b">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-h4">어떤 직무인가요</h2>
+            <p className="text-small text-muted-foreground">
+              직무를 고르면 그 직무에서 중요한 능력치가 초안으로 채워집니다. 그대로 쓰지 마시고
+              우리 팀 상황에 맞게 고쳐 주세요.
+            </p>
+          </div>
+
+          <RolePicker
+            value={form.role_id}
+            onSelect={(role: ResolvedRole, draft) => {
+              setAbilityDraft(JSON.stringify(draft));
+              setForm((f) => ({
+                ...f,
+                role_id: role.id,
+                // 이미 고른 것이 있으면 덮어쓰지 않는다 — 담당자가 한 일을 지우면 안 된다
+                required_abilities:
+                  Object.keys(f.required_abilities).length > 0 ? f.required_abilities : draft,
+                title: f.title || role.name,
+              }));
+            }}
+            onClear={() => setForm((f) => ({ ...f, role_id: '' }))}
+          />
         </section>
 
         {/* 요구 능력치 */}

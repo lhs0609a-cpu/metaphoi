@@ -1,4 +1,5 @@
 import { type RawTestScores, type AbilityScore } from '@/data/tests/comprehensive';
+import { type AbilityKey } from '@/data/roles/types';
 import { type CrossValidationResult } from './cross-validation';
 
 // 30가지 능력치 정의 + 산출 공식
@@ -495,6 +496,27 @@ const ABILITY_DEFS: AbilityDef[] = [
     ),
   },
 ];
+
+
+/**
+ * 능력치 목록 — 이 파일이 유일한 출처다.
+ *
+ * 예전에는 공고 등록 화면이 자체 목록을 들고 있었고, 그 키가 여기와
+ * 달랐다(decisiveness vs determination 등 5개). 그러면 매칭 쪽
+ * seeker_map.get(key, 50) 이 항상 기본값을 돌려주면서, 적합도의 60%를
+ * 차지하는 능력 적합이 조용히 무력화된다. 화면에는 아무 표시도 나지 않는다.
+ * 그래서 목록을 여기서만 만든다.
+ */
+export const ABILITY_CATALOG: { key: AbilityKey; name: string; category: string }[] =
+  ABILITY_DEFS.map((d) => ({
+    key: d.key as AbilityKey,
+    name: d.name,
+    category: d.category,
+  }));
+
+export const ABILITY_NAME: Record<string, string> = Object.fromEntries(
+  ABILITY_DEFS.map((d) => [d.key, d.name]),
+);
 
 // 30가지 능력치 산출 메인 함수
 // crossValidation이 주어지면 모순된 능력치를 중앙(50)으로 수축
