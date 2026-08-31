@@ -7,6 +7,7 @@ import { PersonalInfoForm } from './personal-info-form';
 import { MilestoneFeedback } from './milestone-feedback';
 import { comprehensiveQuestions, type PersonalInfo } from '@/data/tests/comprehensive';
 import { scoreComprehensive } from '@/lib/comprehensive-scoring';
+import { computeHiringAbilities } from '@/lib/hiring-abilities';
 import {
   getComprehensiveSession,
   saveComprehensiveProgress,
@@ -154,7 +155,8 @@ export function ComprehensiveTestContainer() {
       api.results.saveAnonymous({
         session_id: sessionId,
         comprehensive_profile: profile,
-        abilities_snapshot: profile.abilities || [],
+        // 이 스냅샷은 나중에 기업 화면으로 이어진다. 사주·사상 제외본을 보낸다
+        abilities_snapshot: computeHiringAbilities(profile.rawScores),
         personal_info: personalInfo,
         answers,
       }).catch(() => {});

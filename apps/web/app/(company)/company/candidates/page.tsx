@@ -193,7 +193,7 @@ export default function CompanyCandidatesPage() {
                         />
                       ))}
                       <p className="mt-1 text-micro text-muted-foreground">
-                        규준 수집 전이라 후보자 내부 상대 점수입니다
+                        규준 수집 전 내부 상대 점수 · 사주·사상체질 제외
                       </p>
                     </div>
                   ) : null}

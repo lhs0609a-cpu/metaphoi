@@ -14,6 +14,7 @@ import { StatBar } from '@/components/results/stat-bar';
 import { TypeBadgeCard } from '@/components/results/type-badge-card';
 import { AbilityCategorySection } from '@/components/results/ability-category-section';
 import { NormStatusBadge } from '@/components/measure/honesty';
+import { RoleFit } from '@/components/results/role-fit';
 
 import { getComprehensiveSession } from '@/lib/test-session';
 import { useAuthStore } from '@/lib/auth';
@@ -203,6 +204,9 @@ export default function ComprehensiveResultPreview() {
             </div>
           </section>
         )}
+
+        {/* 흥미 기반 직군 적합 — 능력치와 분리해서 보여준다 */}
+        <RoleFit holland={profile.rawScores?.holland ?? {}} />
 
         <section className="mt-10">
           <ShareButtons

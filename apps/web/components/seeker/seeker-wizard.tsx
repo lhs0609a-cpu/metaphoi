@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { computeHiringAbilities } from '@/lib/hiring-abilities';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
@@ -310,7 +311,10 @@ export function SeekerWizard() {
       desired_industries: phase1Data.desired_industries,
       ...matchingData,
       comprehensive_profile: session?.profile || null,
-      abilities_snapshot: session?.profile?.abilities || null,
+      // 기업 화면으로 나가는 능력치 — 사주·사상체질 제외
+      abilities_snapshot: session?.profile?.rawScores
+        ? computeHiringAbilities(session.profile.rawScores)
+        : null,
       career_questionnaire: answers,
     };
 

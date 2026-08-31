@@ -217,7 +217,9 @@ export default function CandidateDetailPage() {
             ))}
             <p className="mt-2 text-micro leading-relaxed text-muted-foreground">
               규준 표본이 확보되기 전이라 모집단 대비 백분위가 아니라 후보자 내부 상대 점수입니다.
-              후보자 간 직접 비교에는 적합하지 않습니다.
+              후보자 간 직접 비교에는 적합하지 않습니다. 또한 이 값은 사주·사상체질 항목을 제외하고
+              산출한 것이라, 후보자가 본 결과 화면의 숫자와 다를 수 있습니다 —
+              생년월일과 성별이 채용 판단에 반영되지 않도록 한 조치입니다.
             </p>
           </div>
         </section>

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { computeHiringAbilities } from './hiring-abilities';
 import { persist } from 'zustand/middleware';
 import { api } from './api';
 
@@ -157,7 +158,11 @@ export const useAuthStore = create<AuthState>()(
           const response = await api.results.saveComprehensive(
             {
               comprehensive_profile: session.profile,
-              abilities_snapshot: session.profile.abilities || [],
+              // 기업에 전달되는 값은 사주·사상체질을 뺀 것으로 보낸다.
+              // 생년월일과 성별이 채용 정렬에 들어가면 안 된다.
+              abilities_snapshot: session.profile.rawScores
+                ? computeHiringAbilities(session.profile.rawScores)
+                : [],
               personal_info: session.personalInfo || null,
               answers: session.answers || null,
             },
