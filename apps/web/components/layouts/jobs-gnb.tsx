@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Logo } from './logo';
+import { LogoMark } from './logo';
 import { SearchBar } from './search-bar';
+import { cn } from '@/lib/utils';
 
-const subNavItems = [
+const SUB_NAV = [
   { href: '/jobs', label: '채용정보' },
   { href: '/jobs/companies', label: '기업정보' },
   { href: '/seeker/matches', label: '내 매칭' },
@@ -18,47 +19,55 @@ export function JobsGnb() {
   const pathname = usePathname();
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
-      {/* 상단 바 */}
-      <div className="container mx-auto px-4 h-14 flex items-center justify-between gap-4">
-        <Logo variant="jobs" href="/jobs" />
-        <div className="hidden md:block flex-1 max-w-md mx-4">
+    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
+      <div className="shell flex h-14 items-center justify-between gap-4">
+        <Link href="/jobs" className="flex shrink-0 items-center gap-2 text-body font-bold tracking-tight">
+          <LogoMark className="h-5 w-5 text-primary" />
+          <span className="hidden sm:inline">Metaphoi</span>
+          <span className="text-muted-foreground">채용</span>
+        </Link>
+
+        <div className="mx-2 hidden max-w-md flex-1 md:block">
           <SearchBar />
         </div>
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-            로그인
-          </Link>
-          <Link href="/company/register">
-            <Button variant="outline" size="sm">기업회원</Button>
-          </Link>
+
+        <div className="flex shrink-0 items-center gap-2">
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/login">로그인</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/company/register">기업 회원</Link>
+          </Button>
         </div>
       </div>
-      {/* 하단 서브 네비게이션 */}
-      <div className="border-t hidden sm:block">
-        <div className="container mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto">
-            {subNavItems.map((item) => {
-              const isActive = pathname === item.href || (item.href !== '/jobs' && pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`px-4 py-3 text-sm whitespace-nowrap border-b-2 transition-colors ${
-                    isActive
-                      ? 'border-primary text-primary font-medium'
-                      : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/30'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+
+      {/* 서브 내비 — 현재 위치를 색이 아니라 밑줄과 무게로 표시한다.
+          브랜드색을 여기 쓰면 화면에서 가장 눈에 띄는 것이 메뉴가 된다 */}
+      <nav className="hidden border-t border-border sm:block">
+        <div className="shell scroll-x flex gap-1">
+          {SUB_NAV.map((item) => {
+            const active =
+              pathname === item.href || (item.href !== '/jobs' && pathname.startsWith(item.href));
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                className={cn(
+                  'whitespace-nowrap border-b-2 px-3.5 py-3 text-small transition-colors duration-fast',
+                  active
+                    ? 'border-foreground font-semibold text-foreground'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
-      </div>
-      {/* 모바일 검색바 */}
-      <div className="md:hidden border-t px-4 py-2">
+      </nav>
+
+      <div className="border-t border-border px-4 py-2 md:hidden">
         <SearchBar />
       </div>
     </header>

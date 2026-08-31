@@ -1,170 +1,350 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { EmptyState, Skeleton } from '@/components/ui/states';
 import { marketplaceApi } from '@/lib/marketplace-api';
+import { getComprehensiveSession } from '@/lib/test-session';
+import {
+  isDiscriminative,
+  matchFamiliesForSeeker,
+  RESOLVED_ROLES,
+  BAND_LABEL,
+} from '@/lib/role-matching';
+import { INDUSTRIES } from '@/data/roles/families';
+import type { RiasecProfile } from '@/data/roles/types';
+import { cn } from '@/lib/utils';
+
+interface Job {
+  id: string;
+  title: string;
+  description?: string | null;
+  role_id?: string | null;
+  companies?: { name?: string; location?: string } | null;
+  conditions?: { salary_range?: string; remote?: string } | null;
+}
+
+interface Company {
+  id: string;
+  name: string;
+  industry?: string | null;
+  size_range?: string | null;
+  culture_tags?: string[] | null;
+}
+
+const REMOTE_LABEL: Record<string, string> = {
+  remote: '재택',
+  hybrid: '하이브리드',
+  onsite: '출근',
+};
+
+const ROLE_BY_ID = new Map(RESOLVED_ROLES.map((r) => [r.id, r]));
 
 export default function JobsHomePage() {
-  const [jobs, setJobs] = useState<any[]>([]);
-  const [companies, setCompanies] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
+  const [industryId, setIndustryId] = useState<string | null>(null);
+  /** 내 흥미와 맞는 직군만 보기 */
+  const [onlyMatched, setOnlyMatched] = useState(false);
+  const [riasec, setRiasec] = useState<RiasecProfile | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      marketplaceApi.jobs.list(),
-      marketplaceApi.companies.list(),
-    ]).then(([jobsRes, compRes]) => {
-      setJobs((jobsRes.data as any)?.jobs || []);
-      setCompanies((compRes.data as any)?.companies || []);
-      setLoading(false);
-    });
+    Promise.all([marketplaceApi.jobs.list(), marketplaceApi.companies.list()])
+      .then(([jobsRes, compRes]) => {
+        setJobs(((jobsRes.data as any)?.jobs as Job[]) || []);
+        setCompanies(((compRes.data as any)?.companies as Company[]) || []);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
+  // 검사를 마친 사람이면 흥미 프로필을 읽어 온다.
+  // 없으면 이 화면은 그냥 공고 목록으로 동작한다 — 검사를 강요하지 않는다.
+  useEffect(() => {
+    const session = getComprehensiveSession();
+    const holland = session?.profile?.rawScores?.holland;
+    if (!holland) return;
+    const p = {
+      R: holland.R ?? 0, I: holland.I ?? 0, A: holland.A ?? 0,
+      S: holland.S ?? 0, E: holland.E ?? 0, C: holland.C ?? 0,
+    } as RiasecProfile;
+    if (isDiscriminative(p)) setRiasec(p);
+  }, []);
+
+  const matched = useMemo(
+    () => (riasec ? matchFamiliesForSeeker(riasec, { limit: 5 }) : []),
+    [riasec]
+  );
+  const matchedFamilyIds = useMemo(() => new Set(matched.map((m) => m.family.id)), [matched]);
+
+  const visible = useMemo(() => {
+    return jobs.filter((job) => {
+      const role = job.role_id ? ROLE_BY_ID.get(job.role_id) : null;
+      if (industryId && role?.industryId !== industryId) return false;
+      // 직무가 지정되지 않은 공고는 걸러낼 근거가 없으므로 남긴다.
+      // 필터에 안 걸린다고 감추면 공고가 조용히 사라진다.
+      if (onlyMatched && role && !matchedFamilyIds.has(role.familyId)) return false;
+      return true;
+    });
+  }, [jobs, industryId, onlyMatched, matchedFamilyIds]);
+
   return (
-    <div className="bg-gradient-to-b from-background to-muted/30">
-      {/* Hero */}
-      <section className="container mx-auto px-4 pt-12 pb-10 text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-3">
-          능력치 기반 <span className="text-primary">채용 매칭</span> 플랫폼
-        </h1>
-        <p className="text-muted-foreground max-w-lg mx-auto mb-6">
-          7가지 심리검사로 측정된 30가지 능력치를 기반으로
-          나에게 가장 잘 맞는 기업을 찾아드립니다
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link href="/seeker/register">
-            <Button size="lg">프로필 등록하기</Button>
-          </Link>
-          <Link href="/company/register">
-            <Button variant="outline" size="lg">기업 가입하기</Button>
-          </Link>
+    <>
+      <section className="shell py-12 lg:py-16">
+        <div className="flex flex-col items-start gap-4">
+          <p className="eyebrow">채용</p>
+          <h1 className="text-h1">능력치로 찾는 자리</h1>
+          <p className="max-w-[46ch] text-lead text-muted-foreground">
+            검사를 마치면 흥미와 맞는 직군의 공고를 먼저 보여드립니다. 프로필을 공개하면
+            기업이 먼저 연락합니다.
+          </p>
         </div>
-      </section>
 
-      {/* How it works */}
-      <section className="container mx-auto px-4 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-          {[
-            { step: '1', title: '무료 검사 완료', desc: '30가지 능력치 프로필이 자동 생성됩니다' },
-            { step: '2', title: '프로필 등록', desc: '나와 핏이 맞는 기업이 자동으로 매칭됩니다' },
-            { step: '3', title: '매칭 & 채용', desc: '양방향 관심 확인 후 면접, 그리고 채용까지' },
-          ].map((item) => (
-            <div key={item.step} className="text-center">
-              <div className="w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center mx-auto mb-3 text-lg font-bold">
-                {item.step}
-              </div>
-              <h3 className="font-bold mb-1">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
+        {/* 검사를 마친 사람에게만 보이는 줄 */}
+        {matched.length > 0 && (
+          <div className="mt-8 rounded-card border border-border p-5 sm:p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <p className="eyebrow">내 흥미와 맞는 직군</p>
+              <Link
+                href="/results/preview"
+                className="text-tiny text-muted-foreground hover:text-foreground"
+              >
+                결과 다시 보기
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* 추천 채용공고 */}
-      <section className="container mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">채용 공고</h2>
-          <Link href="/jobs/search" className="text-sm text-primary hover:underline">
-            전체 보기
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
-          </div>
-        ) : jobs.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              현재 채용 공고가 없습니다. 곧 등록될 예정입니다.
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {jobs.slice(0, 6).map((job) => (
-              <Link key={job.id} href={`/jobs/${job.id}`}>
-                <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-                  <CardContent className="pt-5 pb-4">
-                    <h3 className="font-bold mb-1 line-clamp-1">{job.title}</h3>
-                    <p className="text-sm text-primary mb-2">
-                      {job.companies?.name || '기업명'}
-                      {job.companies?.location && ` · ${job.companies.location}`}
-                    </p>
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                      {job.description || ''}
-                    </p>
-                    <div className="flex gap-2 text-xs text-muted-foreground">
-                      {job.conditions?.salary_range && <span>{job.conditions.salary_range}</span>}
-                      {job.conditions?.remote && (
-                        <span>
-                          {job.conditions.remote === 'remote' ? '재택' : job.conditions.remote === 'hybrid' ? '하이브리드' : '출근'}
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {matched.map((m) => (
+                <li
+                  key={m.family.id}
+                  className="rounded-pill bg-sunk px-3 py-1.5 text-small"
+                >
+                  {m.family.name}
+                  <span className="ml-2 text-tiny text-muted-foreground">
+                    {BAND_LABEL[m.band]}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </section>
 
-      {/* 기업 리스트 */}
-      <section className="container mx-auto px-4 py-10">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">기업 정보</h2>
-          <Link href="/jobs/companies" className="text-sm text-primary hover:underline">
-            전체 보기
+      <div className="shell">
+        <div className="rule" />
+      </div>
+
+      <section className="shell py-12 lg:py-16">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h2 className="text-h3">채용 공고</h2>
+          <Link
+            href="/jobs/search"
+            className="text-small text-muted-foreground hover:text-foreground"
+          >
+            상세 검색
           </Link>
         </div>
 
-        {loading ? null : companies.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center text-muted-foreground">
-              등록된 기업이 없습니다
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {companies.slice(0, 8).map((company) => (
-              <Link key={company.id} href={`/jobs/companies/${company.id}`}>
-                <Card className="hover:border-primary/50 transition-colors cursor-pointer h-full">
-                  <CardContent className="pt-5 pb-4">
-                    <h3 className="font-bold mb-1">{company.name}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {company.industry || ''} {company.size_range ? `· ${company.size_range}명` : ''}
-                    </p>
-                    {company.culture_tags && company.culture_tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {company.culture_tags.slice(0, 3).map((tag: string) => (
-                          <span key={tag} className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">{tag}</span>
-                        ))}
+        {/* 필터 */}
+        <div className="mt-5 flex flex-col gap-3">
+          {matched.length > 0 && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setOnlyMatched((v) => !v)}
+                aria-pressed={onlyMatched}
+                className={cn(
+                  'rounded-pill border px-3.5 py-2 text-small font-medium transition-colors duration-fast',
+                  onlyMatched
+                    ? 'border-action bg-action text-action-foreground'
+                    : 'border-border-strong text-foreground hover:bg-sunk'
+                )}
+              >
+                내 흥미와 맞는 직군만
+              </button>
+            </div>
+          )}
+
+          <div className="scroll-x flex gap-1.5 pb-1">
+            <button
+              type="button"
+              onClick={() => setIndustryId(null)}
+              className={cn(
+                'shrink-0 rounded-pill border px-3 py-1.5 text-tiny font-medium transition-colors duration-fast',
+                industryId === null
+                  ? 'border-action bg-action text-action-foreground'
+                  : 'border-border text-muted-foreground hover:border-border-strong hover:text-foreground'
+              )}
+            >
+              전체
+            </button>
+            {INDUSTRIES.map((ind) => (
+              <button
+                key={ind.id}
+                type="button"
+                onClick={() => setIndustryId(industryId === ind.id ? null : ind.id)}
+                className={cn(
+                  'shrink-0 rounded-pill border px-3 py-1.5 text-tiny font-medium transition-colors duration-fast',
+                  industryId === ind.id
+                    ? 'border-action bg-action text-action-foreground'
+                    : 'border-border text-muted-foreground hover:border-border-strong hover:text-foreground'
+                )}
+              >
+                {ind.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 목록 — 카드 격자가 아니라 줄로 놓는다.
+            공고는 훑으면서 비교하는 것이라 세로로 늘어서는 편이 읽힌다 */}
+        <div className="mt-6">
+          {loading ? (
+            <div className="flex flex-col gap-3">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-24 w-full" />
+              ))}
+            </div>
+          ) : visible.length === 0 ? (
+            <EmptyState
+              title={
+                jobs.length === 0 ? '등록된 공고가 없습니다' : '조건에 맞는 공고가 없습니다'
+              }
+              description={
+                jobs.length === 0
+                  ? '기업이 공고를 올리면 여기에 나타납니다.'
+                  : '업종을 바꾸거나 필터를 해제해 보세요.'
+              }
+              action={
+                jobs.length > 0
+                  ? {
+                      label: '필터 해제',
+                      onClick: () => {
+                        setIndustryId(null);
+                        setOnlyMatched(false);
+                      },
+                    }
+                  : { label: '무료 검사 시작하기', href: '/start' }
+              }
+            />
+          ) : (
+            <ul className="flex flex-col">
+              {visible.map((job) => {
+                const role = job.role_id ? ROLE_BY_ID.get(job.role_id) : null;
+                const isMatch = role ? matchedFamilyIds.has(role.familyId) : false;
+                return (
+                  <li key={job.id} className="border-t border-border last:border-b">
+                    <Link
+                      href={`/jobs/${job.id}`}
+                      className="flex flex-col gap-2 py-5 transition-colors duration-fast hover:bg-sunk"
+                    >
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-lead font-semibold">{job.title}</span>
+                        {isMatch && (
+                          <Badge tone="ok" size="sm">
+                            흥미 일치
+                          </Badge>
+                        )}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        )}
+
+                      <p className="text-small text-muted-foreground">
+                        {job.companies?.name ?? '기업명 미상'}
+                        {job.companies?.location ? ` · ${job.companies.location}` : ''}
+                        {role ? ` · ${role.familyName}` : ''}
+                      </p>
+
+                      {job.description ? (
+                        <p className="line-clamp-2 max-w-prose text-small text-muted-foreground">
+                          {job.description}
+                        </p>
+                      ) : null}
+
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-tiny text-muted-foreground">
+                        {job.conditions?.salary_range ? (
+                          <span>{job.conditions.salary_range}</span>
+                        ) : null}
+                        {job.conditions?.remote ? (
+                          <span>{REMOTE_LABEL[job.conditions.remote] ?? job.conditions.remote}</span>
+                        ) : null}
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       </section>
 
-      {/* CTA */}
-      <section className="container mx-auto px-4 py-12 text-center">
-        <Card className="max-w-xl mx-auto">
-          <CardContent className="pt-8 pb-6">
-            <h2 className="text-xl font-bold mb-2">아직 검사를 안 하셨나요?</h2>
-            <p className="text-sm text-muted-foreground mb-4">
-              무료 검사를 완료하면 능력치 기반 채용 매칭을 받을 수 있습니다
-            </p>
-            <Link href="/start">
-              <Button>무료 검사 시작하기</Button>
+      {/* 기업 */}
+      <section className="bg-sunk py-12 lg:py-16">
+        <div className="shell">
+          <div className="flex flex-wrap items-baseline justify-between gap-3">
+            <h2 className="text-h3">기업</h2>
+            <Link
+              href="/jobs/companies"
+              className="text-small text-muted-foreground hover:text-foreground"
+            >
+              전체 보기
             </Link>
-          </CardContent>
-        </Card>
+          </div>
+
+          {loading ? (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {[0, 1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-28 w-full" />
+              ))}
+            </div>
+          ) : companies.length === 0 ? (
+            <p className="mt-6 text-small text-muted-foreground">등록된 기업이 없습니다.</p>
+          ) : (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {companies.slice(0, 8).map((company) => (
+                <Link
+                  key={company.id}
+                  href={`/jobs/companies/${company.id}`}
+                  className="flex flex-col gap-1.5 rounded-card border border-border bg-card p-5 transition-colors duration-fast hover:border-border-strong"
+                >
+                  <span className="text-body font-semibold">{company.name}</span>
+                  <span className="text-tiny text-muted-foreground">
+                    {[company.industry, company.size_range ? `${company.size_range}명` : null]
+                      .filter(Boolean)
+                      .join(' · ') || '정보 없음'}
+                  </span>
+                  {company.culture_tags && company.culture_tags.length > 0 ? (
+                    <span className="mt-1 line-clamp-1 text-tiny text-muted-foreground">
+                      {company.culture_tags.slice(0, 3).join(' · ')}
+                    </span>
+                  ) : null}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
-    </div>
+
+      {/* 검사를 아직 안 한 사람에게만 */}
+      {matched.length === 0 && (
+        <section className="shell py-12 lg:py-16">
+          <div className="flex flex-col items-start gap-4 rounded-card bg-action px-8 py-12 text-action-foreground sm:px-12">
+            <h2 className="max-w-[20ch] text-h2">
+              어떤 자리가 맞는지 먼저 확인해 보세요
+            </h2>
+            <p className="max-w-[42ch] text-body text-action-foreground/70">
+              53문항, 약 12분. 검사를 마치면 흥미와 맞는 직군의 공고를 먼저 보여드립니다.
+            </p>
+            <Button
+              asChild
+              size="lg"
+              className="mt-2 bg-action-foreground text-action hover:opacity-90"
+            >
+              <Link href="/start">무료로 검사 시작하기</Link>
+            </Button>
+          </div>
+        </section>
+      )}
+    </>
   );
 }
