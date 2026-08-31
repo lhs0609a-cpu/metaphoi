@@ -9,6 +9,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { MilestoneFeedback } from '@/components/tests/milestone-feedback';
 import { SeekerQuestionCard } from './seeker-question-card';
 import { SeekerWizardPhase1 } from './seeker-wizard-phase1';
+import { CultureSurvey } from '@/components/culture/culture-survey';
+import type { CultureProfile } from '@/data/culture/cvf';
 import { SeekerWizardReview } from './seeker-wizard-review';
 
 import { useAuthStore } from '@/lib/auth';
@@ -28,7 +30,7 @@ import {
   type SeekerQuestion,
 } from '@/data/seeker/questionnaire';
 
-type WizardPhase = 'loading' | 'gate' | 1 | 2 | 3 | 4 | 'review' | 'submitting' | 'done';
+type WizardPhase = 'loading' | 'gate' | 1 | 2 | 3 | 4 | 'culture' | 'review' | 'submitting' | 'done';
 
 const MILESTONES = [
   { at: 0.25, message: '좋은 출발이에요!' },
@@ -54,6 +56,11 @@ export function SeekerWizard() {
   const [showMilestone, setShowMilestone] = useState(false);
   const [milestoneMsg, setMilestoneMsg] = useState<{ message: string; progress: number } | null>(null);
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
+  // 조직문화 응답. 기업 쪽과 같은 문항이라야 비교가 되므로 같은 컴포넌트를 쓴다
+  const [culture, setCulture] = useState<{
+    profile: CultureProfile;
+    responses: Record<string, Partial<CultureProfile>>;
+  } | null>(null);
 
   // 질문 목록 계산
   const careerQuestions = useMemo(() => getCareerQuestions(), []);
@@ -240,7 +247,7 @@ export function SeekerWizard() {
     setCurrentQuestionIndex(0);
     if (phase === 2) setPhase(3);
     else if (phase === 3) setPhase(4);
-    else if (phase === 4) setPhase('review');
+    else if (phase === 4) setPhase('culture');
   }, [phase]);
 
   // 이전 질문 / 다음 질문
@@ -316,6 +323,8 @@ export function SeekerWizard() {
         ? computeHiringAbilities(session.profile.rawScores)
         : null,
       career_questionnaire: answers,
+      culture_profile: culture?.profile ?? null,
+      culture_responses: culture?.responses ?? null,
     };
 
     const result = await marketplaceApi.seekers.createProfile(profileData, token);
@@ -454,6 +463,33 @@ export function SeekerWizard() {
             onSubmit={handlePhase1Submit}
           />
         </div>
+      </div>
+    );
+  }
+
+  // 조직문화 — 마지막 단계.
+  // 건너뛸 수 있게 둔다. 여기서 막으면 프로필 등록 자체가 끊긴다.
+  if (phase === 'culture') {
+    return (
+      <div className="shell max-w-[34rem] py-10 lg:py-14">
+        <div className="mb-8 flex flex-col gap-2">
+          <p className="eyebrow">마지막 단계</p>
+          <h1 className="text-h2">어떤 조직에서 일하고 싶으신가요</h1>
+          <p className="text-small leading-relaxed text-muted-foreground">
+            기업도 같은 문항에 답합니다. 두 답을 맞춰 보고 잘 맞는 곳을 먼저 보여드립니다.
+            건너뛰셔도 되지만, 그러면 컬처핏은 계산되지 않습니다.
+          </p>
+        </div>
+
+        <CultureSurvey
+          audience="seeker"
+          initial={culture?.responses}
+          onCancel={() => setPhase('review')}
+          onComplete={(result) => {
+            setCulture(result);
+            setPhase('review');
+          }}
+        />
       </div>
     );
   }

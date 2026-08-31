@@ -12,12 +12,16 @@ import { PageHeader } from '@/components/layouts/page-header';
 import { useToast } from '@/components/ui/use-toast';
 import { useCompanyAuthStore } from '@/lib/company-auth';
 import { marketplaceApi } from '@/lib/marketplace-api';
+import { CultureSurvey, CultureProfileView } from '@/components/culture/culture-survey';
+import type { CultureProfile } from '@/data/culture/cvf';
 
 interface Team {
   id: string;
   team_name: string;
   team_size?: number | null;
   description?: string | null;
+  culture_profile?: CultureProfile | null;
+  culture_responses?: Record<string, Partial<CultureProfile>> | null;
 }
 
 /**
@@ -37,6 +41,9 @@ export default function CompanyTeamPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ team_name: '', team_size: '', description: '' });
+  // 문화 설문을 펼친 팀. 한 번에 하나만 연다 — 여러 개를 동시에 열면
+  // 어느 팀에 답하고 있는지 헷갈린다
+  const [cultureFor, setCultureFor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
@@ -225,6 +232,54 @@ export default function CompanyTeamPage() {
                   >
                     삭제
                   </Button>
+                )}
+              </div>
+
+              {/* 조직문화 — 후보자와 같은 문항으로 재야 비교가 가능하다 */}
+              <div className="border-t border-border pt-3">
+                {cultureFor === team.id ? (
+                  <CultureSurvey
+                    audience="company"
+                    initial={team.culture_responses ?? undefined}
+                    onCancel={() => setCultureFor(null)}
+                    onComplete={async ({ profile, responses }) => {
+                      if (!token) return;
+                      await marketplaceApi.companies.updateTeam(
+                        team.id,
+                        { culture_profile: profile, culture_responses: responses },
+                        token,
+                      );
+                      setTeams((prev) =>
+                        prev.map((t) =>
+                          t.id === team.id
+                            ? { ...t, culture_profile: profile, culture_responses: responses }
+                            : t,
+                        ),
+                      );
+                      setCultureFor(null);
+                      toast({ title: `‘${team.team_name}’ 팀 문화를 저장했습니다` });
+                    }}
+                  />
+                ) : team.culture_profile ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="eyebrow">팀 문화</p>
+                      <Button size="sm" variant="ghost" onClick={() => setCultureFor(team.id)}>
+                        다시 답하기
+                      </Button>
+                    </div>
+                    <CultureProfileView profile={team.culture_profile} />
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <p className="max-w-prose text-small text-muted-foreground">
+                      6문항에 답하면 후보자와 같은 척도로 컬처핏을 계산합니다.
+                      답하지 않으면 컬처핏은 계산에서 제외됩니다.
+                    </p>
+                    <Button size="sm" variant="outline" onClick={() => setCultureFor(team.id)}>
+                      문화 문항 답하기
+                    </Button>
+                  </div>
                 )}
               </div>
             </article>
