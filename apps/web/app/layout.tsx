@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ko_KR',
     siteName: 'Metaphoi',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Metaphoi 종합 심리검사' }],
+    images: [{ url: '/api/og', width: 1200, height: 630, alt: 'Metaphoi 종합 심리검사' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Metaphoi — 성격검사 7개를 겹쳐 능력치 30개로',
     description: '53문항으로 7가지 검사를 한 번에. 취향이 아니라 수치가 남습니다.',
-    images: ['/og-image.png'],
+    images: ['/api/og'],
   },
 };
 

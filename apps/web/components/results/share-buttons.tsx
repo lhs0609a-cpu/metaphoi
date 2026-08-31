@@ -49,7 +49,7 @@ export function ShareButtons({ title, description, url }: ShareButtonsProps) {
       content: {
         title,
         description,
-        imageUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/og-image.png`,
+        imageUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/og`,
         link: {
           mobileWebUrl: shareUrl,
           webUrl: shareUrl,

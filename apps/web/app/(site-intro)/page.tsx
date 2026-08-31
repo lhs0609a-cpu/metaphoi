@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { StatPreview } from './stat-preview';
+import { BrowserFrame, MockupStage, PhoneFrame } from '@/components/marketing/device-frame';
+import { RoleFitPreview } from './role-fit-preview';
 
 export const metadata = {
   title: '성격검사 7개를 겹쳐 능력치 30개로',
@@ -64,9 +66,14 @@ export default function IntroPage() {
           </p>
         </div>
 
-        <div className="anim-rise flex w-full lg:justify-end">
-          <StatPreview />
-        </div>
+        {/* 추상 그래픽 대신 실제로 받게 될 화면을 기기 안에 넣어 보여준다 */}
+        <MockupStage className="anim-rise w-full lg:justify-self-end">
+          <BrowserFrame path="metaphoi.com/results">
+            <div className="p-5 sm:p-6">
+              <StatPreview bare />
+            </div>
+          </BrowserFrame>
+        </MockupStage>
       </section>
 
       <div className="shell">
@@ -138,6 +145,44 @@ export default function IntroPage() {
                 <Link href="/start">검사하고 확인하기</Link>
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================
+          실제 화면 — 무엇을 받는지는 말보다 화면이 빠르다
+          ================================================================ */}
+      <section className="shell py-16 lg:py-24">
+        <div className="grid items-center gap-12 lg:grid-cols-[1fr_20rem] lg:gap-16">
+          <div className="flex flex-col items-start">
+            <p className="eyebrow">검사가 끝나면</p>
+            <h2 className="mt-3 max-w-[18ch] text-h2">
+              흥미와 맞는 직군까지 이어집니다
+            </h2>
+            <p className="mt-4 max-w-[42ch] text-body text-muted-foreground">
+              능력치만 보여주고 끝내지 않습니다. Holland 직업 흥미를 직업별 흥미 프로필과
+              대조해 어떤 직군이 맞는지, 그 직군에 어떤 공고가 있는지까지 연결합니다.
+            </p>
+
+            <ul className="mt-8 flex flex-col gap-3">
+              {[
+                '능력치 30개와 다섯 영역 요약',
+                '잘 맞는 직군과 업종',
+                '그 직군의 채용 공고',
+              ].map((t) => (
+                <li key={t} className="flex items-baseline gap-2.5 text-body">
+                  <span
+                    className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                    aria-hidden="true"
+                  />
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex justify-center lg:justify-end">
+            <RoleFitPreview />
           </div>
         </div>
       </section>

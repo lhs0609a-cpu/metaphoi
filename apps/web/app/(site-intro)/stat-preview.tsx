@@ -22,9 +22,15 @@ const TOP = [
   { name: '회복탄력성', value: 81 },
 ];
 
-export function StatPreview() {
+export function StatPreview({ bare = false }: { bare?: boolean }) {
   return (
-    <div className="w-full max-w-[26rem] rounded-card border border-border bg-card p-6 shadow-e2 sm:p-7">
+    <div
+      className={
+        bare
+          ? 'w-full'
+          : 'w-full max-w-[26rem] rounded-card border border-border bg-card p-6 shadow-e2 sm:p-7'
+      }
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-0.5">
           <p className="eyebrow">결과 미리보기</p>
