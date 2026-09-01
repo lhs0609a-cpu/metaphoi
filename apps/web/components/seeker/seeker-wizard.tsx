@@ -5,7 +5,8 @@ import { computeHiringAbilities } from '@/lib/hiring-abilities';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { PageLoading, ErrorState } from '@/components/ui/states';
+import { Outcome } from '@/components/ui/outcome';
 import { MilestoneFeedback } from '@/components/tests/milestone-feedback';
 import { SeekerQuestionCard } from './seeker-question-card';
 import { SeekerWizardPhase1 } from './seeker-wizard-phase1';
@@ -345,45 +346,23 @@ export function SeekerWizard() {
   // Loading
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">프로필 정보를 확인하는 중...</p>
-        </div>
-      </div>
+      <PageLoading label="프로필 정보를 확인하는 중" />
     );
   }
 
   // Gate (미결제)
   if (phase === 'gate') {
     return (
-      <div className="min-h-screen bg-background py-12">
-        <div className="container mx-auto px-4 max-w-lg">
-          <Card>
-            <CardContent className="pt-8 pb-8 text-center">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              </div>
-              <h2 className="text-xl font-bold mb-2">결제 후 이용 가능합니다</h2>
-              <p className="text-muted-foreground mb-2">
-                채용 프로필을 작성하려면 종합 분석 리포트를 먼저 구매해주세요.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                능력치 프로필이 완성된 상태에서만 기업에게 의미있는 프로필을 보여줄 수 있습니다.
-              </p>
-              <div className="flex flex-col gap-3">
-                <Button size="lg" className="w-full" onClick={() => router.push('/checkout?testCode=comprehensive')}>
-                  전체 분석 잠금 해제
-                </Button>
-                <Button variant="outline" className="w-full" onClick={() => router.push('/results/preview')}>
-                  결과 미리보기로 돌아가기
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      <div className="shell max-w-[34rem] py-16">
+        <Outcome
+          tone="warn"
+          title="전체 분석을 먼저 열어 주세요"
+          description="채용 프로필에는 능력치가 함께 실립니다. 무료 구간만으로는 기업이 볼 수 있는 정보가 부족해서, 프로필을 만들어도 매칭이 되지 않습니다."
+          actions={[
+            { label: '전체 분석 열기', href: '/checkout?testCode=comprehensive' },
+            { label: '결과로 돌아가기', href: '/results/preview', variant: 'outline' },
+          ]}
+        />
       </div>
     );
   }
@@ -391,45 +370,34 @@ export function SeekerWizard() {
   // Done / Submitting
   if (phase === 'submitting' || phase === 'done') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">프로필을 등록하는 중...</p>
-        </div>
-      </div>
+      <PageLoading label="프로필을 등록하는 중" />
     );
   }
 
   // Phase 1: 기본 정보
   if (phase === 1) {
     return (
-      <div className="min-h-screen bg-background py-8">
-        <div className="container mx-auto px-4 max-w-lg">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">채용 프로필 등록</h1>
-            <p className="text-muted-foreground">
-              4단계로 나만의 채용 프로필을 완성하세요
+      <div className="shell max-w-[34rem] py-10 lg:py-14">
+          <header className="mb-8 flex flex-col items-start gap-2">
+            <p className="eyebrow">채용 프로필</p>
+            <h1 className="text-h1">기업에 보여줄 프로필</h1>
+            <p className="max-w-[42ch] text-small leading-relaxed text-muted-foreground">
+              네 단계로 나뉘어 있고, 중간에 나가도 저장됩니다. 공개 범위는 언제든 되돌릴 수
+              있습니다.
             </p>
-          </div>
+          </header>
 
-          {/* 이어하기 배너 */}
           {hasSavedProgress && (
-            <div className="mb-6 animate-fade-in-up">
-              <Card className="border-primary/50 bg-primary/5">
-                <CardContent className="pt-5 pb-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="font-medium text-sm">이전 작성 내용이 저장되어 있습니다</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {answeredCount}개 질문 답변 완료
-                      </p>
-                    </div>
-                    <Button size="sm" onClick={handleResume}>
-                      이어서 하기
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="anim-rise mb-6 flex items-center justify-between gap-4 rounded-card border border-border bg-sunk px-5 py-4">
+              <div className="min-w-0">
+                <p className="text-small font-semibold">이어서 할 내용이 있습니다</p>
+                <p className="mt-0.5 text-tiny text-muted-foreground">
+                  <span className="stat-num" data-numeric>{answeredCount}</span>개 답변 완료
+                </p>
+              </div>
+              <Button size="sm" onClick={handleResume}>
+                이어서 하기
+              </Button>
             </div>
           )}
 
@@ -462,7 +430,6 @@ export function SeekerWizard() {
             initialData={phase1Data}
             onSubmit={handlePhase1Submit}
           />
-        </div>
       </div>
     );
   }
@@ -497,15 +464,12 @@ export function SeekerWizard() {
   // Review
   if (phase === 'review') {
     return (
-      <div className="min-h-screen bg-background py-8">
-        <div className="container mx-auto px-4 max-w-lg">
-          {error && (
-            <Card className="mb-4 border-destructive">
-              <CardContent className="pt-4 pb-3">
-                <p className="text-sm text-destructive">{error}</p>
-              </CardContent>
-            </Card>
-          )}
+      <div className="shell max-w-[34rem] py-10 lg:py-14">
+          {error ? (
+            <div className="mb-5">
+              <ErrorState title="프로필을 등록하지 못했습니다" detail={error} />
+            </div>
+          ) : null}
           <SeekerWizardReview
             phase1={phase1Data}
             answers={answers}
@@ -514,7 +478,6 @@ export function SeekerWizard() {
             onSubmit={handleSubmit}
             submitting={false}
           />
-        </div>
       </div>
     );
   }

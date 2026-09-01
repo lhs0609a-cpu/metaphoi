@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type SeekerQuestion } from '@/data/seeker/questionnaire';
 
 interface SeekerWizardReviewProps {
@@ -37,114 +36,96 @@ export function SeekerWizardReview({
   const styleQs = allQuestions.filter((q) => q.phase === 'style');
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold">입력 내용 확인</h2>
-        <p className="text-muted-foreground mt-1">내용을 확인하고 프로필을 등록해주세요</p>
-      </div>
+    <div className="flex flex-col gap-8">
+      <header className="flex flex-col items-start gap-2">
+        <p className="eyebrow">마지막 확인</p>
+        <h2 className="text-h2">이대로 등록할까요</h2>
+        <p className="text-small text-muted-foreground">
+          등록 후에도 언제든 고칠 수 있습니다
+        </p>
+      </header>
 
-      {/* Phase 1: 기본 정보 */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">기본 정보</CardTitle>
-          <Button variant="ghost" size="sm" onClick={() => onEdit(1)}>
-            수정하기
-          </Button>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">표시 이름</span>
-            <span>{phase1.display_name || '-'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">한줄 소개</span>
-            <span>{phase1.headline || '-'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">희망 직무</span>
-            <span>{phase1.desired_roles.join(', ') || '-'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">관심 산업</span>
-            <span>{phase1.desired_industries.join(', ') || '-'}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <ReviewSection title="기본 정보" onEdit={() => onEdit(1)}>
+        <ReviewRow label="표시 이름" value={phase1.display_name} />
+        <ReviewRow label="한 줄 소개" value={phase1.headline} />
+        <ReviewRow label="희망 직무" value={phase1.desired_roles.join(', ')} />
+        <ReviewRow label="관심 산업" value={phase1.desired_industries.join(', ')} />
+      </ReviewSection>
 
-      {/* Phase 2: 경력/팀워크 */}
       {careerQs.length > 0 && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">경력 & 팀워크</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => onEdit(2)}>
-              수정하기
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {careerQs.map((q) => (
-              <div key={q.id} className="flex justify-between gap-4">
-                <span className="text-muted-foreground shrink-0">{q.questionText.replace(/\?$/, '').slice(0, 20)}...</span>
-                <span className="text-right">{formatAnswer(answers[q.id])}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <ReviewSection title="경력과 팀워크" onEdit={() => onEdit(2)}>
+          {careerQs.map((q) => (
+            <ReviewRow key={q.id} label={shorten(q.questionText)} value={formatAnswer(answers[q.id])} />
+          ))}
+        </ReviewSection>
       )}
 
-      {/* Phase 3: 직군별 */}
       {roleQs.length > 0 && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">직군별 질문</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => onEdit(3)}>
-              수정하기
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {roleQs.map((q) => (
-              <div key={q.id} className="flex justify-between gap-4">
-                <span className="text-muted-foreground shrink-0">{q.questionText.replace(/\?$/, '').slice(0, 20)}...</span>
-                <span className="text-right">{formatAnswer(answers[q.id])}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <ReviewSection title="직군별 질문" onEdit={() => onEdit(3)}>
+          {roleQs.map((q) => (
+            <ReviewRow key={q.id} label={shorten(q.questionText)} value={formatAnswer(answers[q.id])} />
+          ))}
+        </ReviewSection>
       )}
 
-      {/* Phase 4: 근무스타일 */}
       {styleQs.length > 0 && (
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base">근무 스타일 & 문화</CardTitle>
-            <Button variant="ghost" size="sm" onClick={() => onEdit(4)}>
-              수정하기
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            {styleQs.map((q) => (
-              <div key={q.id} className="flex justify-between gap-4">
-                <span className="text-muted-foreground shrink-0">{q.questionText.replace(/\?$/, '').slice(0, 20)}...</span>
-                <span className="text-right">{formatAnswer(answers[q.id])}</span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <ReviewSection title="근무 스타일" onEdit={() => onEdit(4)}>
+          {styleQs.map((q) => (
+            <ReviewRow key={q.id} label={shorten(q.questionText)} value={formatAnswer(answers[q.id])} />
+          ))}
+        </ReviewSection>
       )}
 
-      {/* 제출 */}
-      <div className="space-y-3 pt-2">
-        <Button
-          className="w-full"
-          size="lg"
-          onClick={onSubmit}
-          disabled={submitting}
-        >
-          {submitting ? '등록 중...' : '프로필 등록하기'}
+      <div className="flex flex-col gap-3">
+        <Button size="lg" block onClick={onSubmit} loading={submitting}>
+          프로필 등록하기
         </Button>
-        <p className="text-xs text-center text-muted-foreground">
-          등록 후에도 프로필을 수정할 수 있습니다
+        <p className="text-center text-tiny text-muted-foreground">
+          공개 범위는 등록 후에 조정할 수 있습니다
         </p>
       </div>
+    </div>
+  );
+}
+
+/**
+ * 문항을 목록에 넣을 만큼 줄인다.
+ *
+ * 예전에는 slice(0, 20) 뒤에 무조건 '...' 을 붙여서, 짧은 문항도
+ * "혈액형은..." 처럼 잘린 것처럼 보였다. 실제로 자를 때만 붙인다.
+ */
+function shorten(text: string, max = 22): string {
+  const clean = text.replace(/\?$/, '');
+  return clean.length > max ? `${clean.slice(0, max)}…` : clean;
+}
+
+function ReviewSection({
+  title,
+  onEdit,
+  children,
+}: {
+  title: string;
+  onEdit: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-center justify-between gap-3">
+        <h3 className="text-h4">{title}</h3>
+        <Button variant="ghost" size="sm" onClick={onEdit}>
+          수정
+        </Button>
+      </div>
+      <dl className="mt-2 flex flex-col">{children}</dl>
+    </section>
+  );
+}
+
+function ReviewRow({ label, value }: { label: string; value?: string }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 border-t border-border py-2.5 last:border-b">
+      <dt className="shrink-0 text-small text-muted-foreground">{label}</dt>
+      <dd className="text-right text-small">{value || '—'}</dd>
     </div>
   );
 }
