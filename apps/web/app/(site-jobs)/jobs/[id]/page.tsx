@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/use-toast';
+import { EmptyState, PageLoading } from '@/components/ui/states';
+import { ABILITY_NAME } from '@/lib/abilities-scoring';
+import { RESOLVED_ROLES } from '@/lib/role-matching';
 import { useAuthStore } from '@/lib/auth';
 import { marketplaceApi } from '@/lib/marketplace-api';
 
@@ -17,6 +21,7 @@ export default function JobDetailPublicPage() {
   const [job, setJob] = useState<any>(null);
   const [company, setCompany] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   const [applied, setApplied] = useState(false);
 
   useEffect(() => {
@@ -46,170 +51,166 @@ export default function JobDetailPublicPage() {
     );
 
     if (result.error) {
-      alert(result.error);
-    } else {
-      setApplied(true);
-      if ((result.data as any)?.match) {
-        alert('매칭이 성사되었습니다!');
-      } else {
-        alert('지원이 완료되었습니다');
-      }
+      toast({ title: '지원하지 못했습니다', description: result.error, variant: 'destructive' });
+      return;
     }
+
+    setApplied(true);
+    toast(
+      (result.data as any)?.match
+        ? { title: '매칭이 성사되었습니다', description: '메시지에서 대화를 시작할 수 있습니다' }
+        : { title: '지원했습니다', description: '기업이 확인하면 알려드립니다' },
+    );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    );
-  }
+  if (loading) return <PageLoading label="공고를 불러오는 중" />;
 
   if (!job) {
     return (
-      <div className="container mx-auto px-4 py-12 text-center">
-        <p className="text-muted-foreground mb-4">공고를 찾을 수 없습니다</p>
-        <Link href="/jobs">
-          <Button variant="outline">공고 목록으로</Button>
-        </Link>
+      <div className="shell max-w-[44rem] py-16">
+        <EmptyState
+          title="공고를 찾을 수 없습니다"
+          description="마감되었거나 삭제된 공고입니다."
+          action={{ label: '공고 목록으로', href: '/jobs' }}
+        />
       </div>
     );
   }
 
+  const isActive = job.status === 'active';
+  const role = job.role_id ? RESOLVED_ROLES.find((r) => r.id === job.role_id) : null;
+  const requirements = Object.entries(job.required_abilities ?? {}) as [string, { min: number }][];
+
+  const facts: [string, string][] = [
+    ['연봉', job.conditions?.salary_range || '—'],
+    ['근무지', job.conditions?.location || '—'],
+    [
+      '근무 형태',
+      job.conditions?.remote === 'remote'
+        ? '재택'
+        : job.conditions?.remote === 'hybrid'
+          ? '하이브리드'
+          : job.conditions?.remote === 'onsite'
+            ? '출근'
+            : '—',
+    ],
+    [
+      '경력',
+      job.conditions?.experience_min != null || job.conditions?.experience_max != null
+        ? `${job.conditions?.experience_min ?? 0}~${job.conditions?.experience_max ?? ''}년`
+        : '—',
+    ],
+  ];
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      {/* 공고 정보 */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold">{job.title}</h1>
-          <span className={`px-2 py-1 text-xs rounded-full ${
-            job.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-          }`}>
-            {job.status === 'active' ? '모집중' : '마감'}
-          </span>
+    <div className="shell max-w-[44rem] pb-28 pt-10 lg:pt-14">
+      <header className="flex flex-col items-start gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge tone={isActive ? 'ok' : 'neutral'} size="sm" dot>
+            {isActive ? '모집중' : '마감'}
+          </Badge>
+          {role ? (
+            <span className="text-tiny text-muted-foreground">
+              {role.industryName} · {role.familyName}
+            </span>
+          ) : null}
         </div>
-        {company && (
-          <Link href={`/jobs/companies/${company.id}`} className="text-primary hover:underline">
+
+        <h1 className="text-h1">{job.title}</h1>
+
+        {company ? (
+          <Link
+            href={`/jobs/companies/${company.id}`}
+            className="text-body font-semibold text-primary underline-offset-4 hover:underline"
+          >
             {company.name}
           </Link>
-        )}
-      </div>
+        ) : null}
+      </header>
 
-      {/* 상세 설명 */}
-      {job.description && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">직무 설명</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground whitespace-pre-wrap">{job.description}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* 조건 */}
-      {job.conditions && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">근무 조건</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              {job.conditions.salary_range && (
-                <div>
-                  <span className="text-muted-foreground">연봉</span>
-                  <p className="font-medium">{job.conditions.salary_range}</p>
-                </div>
-              )}
-              {job.conditions.location && (
-                <div>
-                  <span className="text-muted-foreground">근무지</span>
-                  <p className="font-medium">{job.conditions.location}</p>
-                </div>
-              )}
-              {job.conditions.remote && (
-                <div>
-                  <span className="text-muted-foreground">근무 형태</span>
-                  <p className="font-medium">
-                    {job.conditions.remote === 'remote' ? '재택' : job.conditions.remote === 'hybrid' ? '하이브리드' : '출근'}
-                  </p>
-                </div>
-              )}
-              {(job.conditions.experience_min != null || job.conditions.experience_max != null) && (
-                <div>
-                  <span className="text-muted-foreground">경력</span>
-                  <p className="font-medium">
-                    {job.conditions.experience_min || 0}~{job.conditions.experience_max || ''}년
-                  </p>
-                </div>
-              )}
+      {/* 조건 — 가장 먼저 확인하는 정보라 위로 올린다 */}
+      <section className="mt-8 rounded-card border border-border p-6">
+        <dl className="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+          {facts.map(([k, v]) => (
+            <div key={k} className="flex flex-col gap-0.5">
+              <dt className="text-micro text-muted-foreground">{k}</dt>
+              <dd className="text-small font-medium">{v}</dd>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          ))}
+        </dl>
+      </section>
 
-      {/* 요구 능력치 */}
-      {job.required_abilities && Object.keys(job.required_abilities).length > 0 && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">원하는 역량</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(job.required_abilities).map(([key, val]: any) => (
-                <span key={key} className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                  {key}: {val.min}+
+      {job.description ? (
+        <section className="mt-10">
+          <h2 className="text-h3">직무 설명</h2>
+          <p className="mt-4 max-w-prose whitespace-pre-wrap text-body leading-relaxed text-muted-foreground">
+            {job.description}
+          </p>
+        </section>
+      ) : null}
+
+      {requirements.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="text-h3">원하는 역량</h2>
+          <p className="mt-1 text-small text-muted-foreground">
+            기준에 못 미치는 만큼만 감점됩니다. 넘친다고 가점되지는 않습니다.
+          </p>
+          <ul className="mt-5 flex flex-col">
+            {requirements.map(([key, val]) => (
+              <li
+                key={key}
+                className="flex items-center justify-between gap-4 border-t border-border py-3 last:border-b"
+              >
+                {/* 예전에는 problemSolving 같은 내부 키가 그대로 노출됐다 */}
+                <span className="text-small">{ABILITY_NAME[key] ?? key}</span>
+                <span className="stat-num text-small text-muted-foreground" data-numeric>
+                  {val.min} 이상
                 </span>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
-      {/* 회사 정보 */}
-      {company && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">회사 소개</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <h3 className="font-bold mb-1">{company.name}</h3>
-            <div className="flex gap-2 text-sm text-muted-foreground mb-2">
-              {company.industry && <span>{company.industry}</span>}
-              {company.size_range && <span>· {company.size_range}명</span>}
-              {company.location && <span>· {company.location}</span>}
-            </div>
-            {company.description && (
-              <p className="text-sm text-muted-foreground mb-3">{company.description}</p>
-            )}
-            {company.culture_tags && company.culture_tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+      {company ? (
+        <section className="mt-10">
+          <h2 className="text-h3">회사</h2>
+          <div className="mt-4 flex flex-col gap-2">
+            <p className="text-body font-semibold">{company.name}</p>
+            <p className="text-small text-muted-foreground">
+              {[company.industry, company.size_range ? `${company.size_range}명` : null, company.location]
+                .filter(Boolean)
+                .join(' · ') || '정보 없음'}
+            </p>
+            {company.description ? (
+              <p className="max-w-prose text-small leading-relaxed text-muted-foreground">
+                {company.description}
+              </p>
+            ) : null}
+            {company.culture_tags?.length ? (
+              <div className="mt-1 flex flex-wrap gap-1.5">
                 {company.culture_tags.map((tag: string) => (
-                  <span key={tag} className="px-2 py-0.5 bg-muted text-xs rounded-full">{tag}</span>
+                  <span key={tag} className="rounded-pill bg-sunk px-2.5 py-1 text-tiny">
+                    {tag}
+                  </span>
                 ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
-      {/* 지원 CTA */}
-      <div className="sticky bottom-4 sm:static">
-        <Card className="border-primary/30">
-          <CardContent className="pt-5 pb-4 flex items-center justify-between gap-4">
-            <div>
-              <p className="font-semibold">{job.title}</p>
-              <p className="text-sm text-muted-foreground">{company?.name || ''}</p>
-            </div>
-            <Button
-              onClick={handleApply}
-              disabled={applied || job.status !== 'active'}
-              className="shrink-0"
-            >
-              {applied ? '지원 완료' : job.status === 'active' ? '지원하기' : '마감됨'}
-            </Button>
-          </CardContent>
-        </Card>
+      {/* 지원 — 화면 아래 고정. 길게 읽다가 되돌아가지 않아도 되게 */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md">
+        <div className="shell flex max-w-[44rem] items-center justify-between gap-4 py-3">
+          <div className="min-w-0">
+            <p className="truncate text-small font-semibold">{job.title}</p>
+            <p className="truncate text-tiny text-muted-foreground">{company?.name ?? ''}</p>
+          </div>
+          <Button onClick={handleApply} disabled={applied || !isActive} className="shrink-0">
+            {applied ? '지원 완료' : isActive ? '지원하기' : '마감됨'}
+          </Button>
+        </div>
       </div>
     </div>
   );

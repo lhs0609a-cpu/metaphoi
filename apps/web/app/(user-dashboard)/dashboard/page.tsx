@@ -5,7 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/layouts/page-header';
+import { EmptyState } from '@/components/ui/states';
+import { NormStatusBadge } from '@/components/measure/honesty';
+import { RoleFit } from '@/components/results/role-fit';
 import { useAuth } from '@/lib/auth';
 import { RadarChart } from '@/components/charts/radar-chart';
 import {
@@ -68,177 +71,160 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="container mx-auto px-4 py-8">
-        {/* Page header with user info and logout */}
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold">대시보드</h1>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">
-              {user?.name || user?.email || '사용자'}
-            </span>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              로그아웃
+    <div className="shell max-w-[52rem] py-10 lg:py-14">
+      <PageHeader
+        eyebrow={user?.name || user?.email || '내 계정'}
+        title="대시보드"
+        actions={
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            로그아웃
+          </Button>
+        }
+      />
+
+      {/* 검사 결과 */}
+      {hasComprehensive && profile ? (
+        <section className="flex flex-col gap-5">
+          <div className="flex flex-col items-start gap-3">
+            <p className="eyebrow">{profile.personalInfo.name}님의 결과</p>
+            <h2 className="text-h2">{profile.summary.headline}</h2>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-pill bg-sunk px-3 py-1 text-small">
+                {profile.mbti.type} · {profile.disc.type} · {profile.enneagram.wing}
+              </span>
+              <NormStatusBadge status="none" />
+            </div>
+            <p className="max-w-[62ch] text-body leading-relaxed text-muted-foreground">
+              {profile.summary.personality.split('. ').slice(0, 2).join('. ')}.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-7">
+            {[
+              { label: 'MBTI', value: profile.mbti.type },
+              { label: 'DISC', value: profile.disc.type },
+              { label: '에니어그램', value: profile.enneagram.wing },
+              { label: 'Holland', value: profile.holland.topCode },
+              { label: '사상', value: profile.sasang.type },
+              { label: '오행', value: profile.saju.dominant },
+              { label: '혈액형', value: `${profile.blood.type}형` },
+            ].map((t) => (
+              <div key={t.label} className="flex flex-col gap-0.5 rounded-card bg-sunk px-3 py-2.5">
+                <span className="text-micro text-muted-foreground">{t.label}</span>
+                <span className="stat-num text-body leading-none">{t.value}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button asChild>
+              <Link href="/results/preview">결과 자세히 보기</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/seeker/register">채용 프로필 만들기</Link>
             </Button>
           </div>
-        </div>
-
-        {/* 종합 검사 결과 */}
-        <section className="mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>종합 심리검사 결과</CardTitle>
-              <CardDescription>
-                {hasComprehensive
-                  ? '7가지 검사 종합 분석이 완료되었습니다'
-                  : '종합 심리검사를 진행해보세요'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {hasComprehensive && profile ? (
-                <div className="space-y-6">
-                  {/* 유형 요약 */}
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {profile.personalInfo.name}님의 종합 유형
-                    </p>
-                    <p className="text-2xl font-bold text-primary mb-2">
-                      {profile.summary.headline}
-                    </p>
-                    <p className="text-sm text-muted-foreground max-w-lg mx-auto">
-                      {profile.summary.personality.slice(0, 120)}...
-                    </p>
-                  </div>
-
-                  {/* 유형 뱃지 */}
-                  <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
-                    {[
-                      { label: 'MBTI', value: profile.mbti.type },
-                      { label: 'DISC', value: profile.disc.type },
-                      { label: '에니어그램', value: profile.enneagram.wing },
-                      { label: 'Holland', value: profile.holland.topCode },
-                      { label: '사상', value: profile.sasang.type },
-                      { label: '오행', value: profile.saju.dominant },
-                      { label: '혈액형', value: `${profile.blood.type}형` },
-                    ].map((item) => (
-                      <div key={item.label} className="text-center p-2 rounded-lg bg-muted/50">
-                        <p className="text-[10px] text-muted-foreground">{item.label}</p>
-                        <p className="text-sm font-bold text-primary">{item.value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* CTA */}
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Link href="/results/preview">
-                      <Button variant="outline">무료 결과 보기</Button>
-                    </Link>
-                    <Link href="/checkout?testCode=comprehensive">
-                      <Button>전체 분석 잠금 해제</Button>
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground mb-4">
-                    아직 종합 검사를 완료하지 않았습니다.
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    7가지 검사를 한 번에 진행하고 종합 분석 결과를 확인하세요.
-                  </p>
-                  <Link href="/test">
-                    <Button size="lg">종합 검사 시작하기</Button>
-                  </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </section>
+      ) : (
+        <EmptyState
+          title="아직 검사를 완료하지 않았습니다"
+          description="7가지 검사를 한 번에 보고 능력치 30개를 받아보세요. 53문항, 약 12분."
+          action={{ label: '검사 시작하기', href: '/start' }}
+        />
+      )}
 
-        {/* 능력치 */}
-        <section className="mb-8">
-          <Card>
-            <CardHeader>
-              <CardTitle>나의 능력치</CardTitle>
-              <CardDescription>
-                검사 결과를 바탕으로 산출된 30가지 능력치
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {hasComprehensive ? (
-                <div className="h-[400px]">
-                  <RadarChart data={abilitiesData} />
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground text-sm">
-                    종합 검사를 완료하면 능력치 레이더 차트가 표시됩니다.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+      {/* 잘 맞는 직군 — 검사한 사람에게만 */}
+      {hasComprehensive && profile?.rawScores?.holland ? (
+        <RoleFit holland={profile.rawScores.holland} />
+      ) : null}
+
+      {/* 능력치 차트 */}
+      {hasComprehensive ? (
+        <section className="mt-10">
+          <h2 className="text-h3">능력치 한눈에</h2>
+          <p className="mt-1 text-small text-muted-foreground">
+            다섯 영역 30개 능력치의 분포입니다
+          </p>
+          <div className="mt-5 rounded-card border border-border p-4">
+            <div className="h-[360px]">
+              <RadarChart data={abilitiesData} />
+            </div>
+          </div>
         </section>
+      ) : null}
 
-        {/* 리포트 구매 */}
-        <section>
-          <Card>
-            <CardHeader>
-              <CardTitle>종합 리포트</CardTitle>
-              <CardDescription>
-                AI 분석 기반 상세 리포트를 받아보세요
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { tier: 'Basic', price: '9,900원', features: ['30개 능력치', '레이더 차트', '유형별 상세 해석'] },
-                  { tier: 'Pro', price: '29,900원', features: ['교차 심층 분석', '직업 추천 TOP 10', 'PDF 내보내기'], recommended: true },
-                  { tier: 'Premium', price: '59,900원', features: ['성장 로드맵', 'AI 1:1 상담', '기업용 리포트'] },
-                ].map((plan) => (
-                  <Card key={plan.tier} className={plan.recommended ? 'border-primary' : ''}>
-                    <CardHeader>
-                      {plan.recommended && (
-                        <span className="text-xs font-semibold text-primary">추천</span>
-                      )}
-                      <CardTitle>{plan.tier}</CardTitle>
-                      <CardDescription className="text-xl font-bold text-foreground">
-                        {plan.price}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-2 mb-4">
-                        {plan.features.map((feature) => (
-                          <li key={feature} className="text-sm flex items-center">
-                            <svg className="w-4 h-4 mr-2 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link href="/checkout?testCode=comprehensive">
-                        <Button
-                          variant={plan.recommended ? 'primary' : 'outline'}
-                          className="w-full"
-                          disabled={!hasComprehensive}
-                        >
-                          구매하기
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))}
+      {/* 리포트 — 검사를 마친 사람에게만 보여준다.
+          할 수 없는 일을 목록으로 늘어놓으면 화면만 무거워진다 */}
+      {hasComprehensive ? (
+        <section className="mt-12">
+          <h2 className="text-h3">전체 리포트</h2>
+          <p className="mt-1 max-w-[52ch] text-small text-muted-foreground">
+            무료 결과에서 잠긴 부분을 엽니다. 한 번 결제하면 계속 볼 수 있습니다.
+          </p>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            {[
+              { tier: 'Basic', price: '9,900원', features: ['능력치 30개 전체', '유형별 상세 해석'] },
+              {
+                tier: 'Pro',
+                price: '29,900원',
+                features: ['교차 심층 분석', '직업 추천 10개', 'PDF 내보내기'],
+                recommended: true,
+              },
+              { tier: 'Premium', price: '59,900원', features: ['성장 로드맵', '기업용 리포트'] },
+            ].map((plan) => (
+              <div
+                key={plan.tier}
+                className={
+                  plan.recommended
+                    ? 'flex flex-col gap-3 rounded-card bg-action px-6 py-6 text-action-foreground'
+                    : 'flex flex-col gap-3 rounded-card border border-border px-6 py-6'
+                }
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-h4">{plan.tier}</span>
+                  {plan.recommended ? (
+                    <span className="rounded-pill bg-action-foreground/15 px-2 py-0.5 text-micro font-semibold">
+                      추천
+                    </span>
+                  ) : null}
+                </div>
+                <span className="stat-num text-h3">{plan.price}</span>
+                <ul className="flex flex-1 flex-col gap-1.5">
+                  {plan.features.map((f) => (
+                    <li
+                      key={f}
+                      className={
+                        plan.recommended
+                          ? 'flex items-start gap-2 text-small text-action-foreground/85'
+                          : 'flex items-start gap-2 text-small text-muted-foreground'
+                      }
+                    >
+                      <span
+                        className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-current opacity-60"
+                        aria-hidden="true"
+                      />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Button
+                  asChild
+                  block
+                  variant={plan.recommended ? undefined : 'outline'}
+                  className={
+                    plan.recommended
+                      ? 'bg-action-foreground text-action hover:opacity-90'
+                      : undefined
+                  }
+                >
+                  <Link href="/checkout?testCode=comprehensive">선택하기</Link>
+                </Button>
               </div>
-              {!hasComprehensive && (
-                <p className="text-center text-sm text-muted-foreground mt-4">
-                  리포트를 구매하려면 종합 검사를 먼저 완료해야 합니다.
-                </p>
-              )}
-            </CardContent>
-          </Card>
+            ))}
+          </div>
         </section>
-      </main>
+      ) : null}
     </div>
   );
 }

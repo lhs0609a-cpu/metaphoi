@@ -4,7 +4,8 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { EmptyState, PageLoading, Skeleton } from '@/components/ui/states';
 import { marketplaceApi } from '@/lib/marketplace-api';
 
 function SearchContent() {
@@ -32,80 +33,89 @@ function SearchContent() {
   }, [query]);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1">채용공고 검색</h1>
-        {query && (
-          <p className="text-muted-foreground">
-            &quot;{query}&quot; 검색 결과 ({jobs.length}건)
+    <div className="shell max-w-[48rem] py-10 lg:py-14">
+      <header className="flex flex-col items-start gap-2">
+        <p className="eyebrow">검색</p>
+        <h1 className="text-h1">{query ? `"${query}"` : '채용 공고'}</h1>
+        {query ? (
+          <p className="text-small text-muted-foreground">
+            <span className="stat-num" data-numeric>
+              {jobs.length}
+            </span>
+            건
           </p>
+        ) : null}
+      </header>
+
+      <div className="mt-8">
+        {loading ? (
+          <div className="flex flex-col gap-3">
+            {[0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-24 w-full" />
+            ))}
+          </div>
+        ) : jobs.length === 0 ? (
+          <EmptyState
+            title={query ? '검색 결과가 없습니다' : '등록된 공고가 없습니다'}
+            description={
+              query
+                ? '다른 키워드로 찾아보시거나 전체 목록을 확인하세요.'
+                : '기업이 공고를 올리면 여기에 나타납니다.'
+            }
+            action={{ label: '전체 공고 보기', href: '/jobs' }}
+          />
+        ) : (
+          <ul className="flex flex-col">
+            {jobs.map((job) => (
+              <li key={job.id} className="border-t border-border last:border-b">
+                <Link
+                  href={`/jobs/${job.id}`}
+                  className="flex flex-col gap-2 py-5 transition-colors duration-fast hover:bg-sunk"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-lead font-semibold">{job.title}</span>
+                    <Badge tone={job.status === 'active' ? 'ok' : 'neutral'} size="sm" dot>
+                      {job.status === 'active' ? '모집중' : '마감'}
+                    </Badge>
+                  </div>
+
+                  <p className="text-small text-muted-foreground">
+                    {job.companies?.name ?? '기업명 미상'}
+                    {job.companies?.location ? ` · ${job.companies.location}` : ''}
+                  </p>
+
+                  {job.description ? (
+                    <p className="line-clamp-2 max-w-prose text-small text-muted-foreground">
+                      {job.description}
+                    </p>
+                  ) : null}
+
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-tiny text-muted-foreground">
+                    {job.conditions?.salary_range ? <span>{job.conditions.salary_range}</span> : null}
+                    {job.conditions?.location ? <span>{job.conditions.location}</span> : null}
+                    {job.conditions?.remote ? (
+                      <span>
+                        {job.conditions.remote === 'remote'
+                          ? '재택'
+                          : job.conditions.remote === 'hybrid'
+                            ? '하이브리드'
+                            : '출근'}
+                      </span>
+                    ) : null}
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
       </div>
-
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
-        </div>
-      ) : jobs.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-muted-foreground mb-4">
-              {query ? `"${query}"에 대한 검색 결과가 없습니다` : '현재 채용 공고가 없습니다'}
-            </p>
-            <Link href="/jobs">
-              <Button variant="outline">전체 공고 보기</Button>
-            </Link>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {jobs.map((job) => (
-            <Link key={job.id} href={`/jobs/${job.id}`}>
-              <Card className="hover:border-primary/50 transition-colors cursor-pointer mb-4">
-                <CardContent className="py-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <h3 className="font-bold">{job.title}</h3>
-                      <p className="text-sm text-primary">
-                        {job.companies?.name || '기업명'}
-                        {job.companies?.location && ` · ${job.companies.location}`}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {job.description || ''}
-                      </p>
-                      <div className="flex gap-2 mt-2 text-xs text-muted-foreground">
-                        {job.conditions?.salary_range && <span>{job.conditions.salary_range}</span>}
-                        {job.conditions?.remote && (
-                          <span>
-                            {job.conditions.remote === 'remote' ? '재택' : job.conditions.remote === 'hybrid' ? '하이브리드' : '출근'}
-                          </span>
-                        )}
-                        {job.conditions?.location && <span>{job.conditions.location}</span>}
-                      </div>
-                    </div>
-                    <span className={`px-2 py-1 text-xs rounded-full shrink-0 ${
-                      job.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'
-                    }`}>
-                      {job.status === 'active' ? '모집중' : '마감'}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
 
 export default function JobsSearchPage() {
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-12 text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto" />
-      </div>
-    }>
+    <Suspense fallback={<PageLoading label="불러오는 중" />}>
       <SearchContent />
     </Suspense>
   );
