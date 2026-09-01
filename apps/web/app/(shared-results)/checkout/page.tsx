@@ -5,7 +5,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { ErrorState, PageLoading } from '@/components/ui/states';
 import { RadarChart } from '@/components/results/radar-chart';
 import { CATEGORY_COLORS } from '@/lib/design-tokens';
 import { useAuthStore } from '@/lib/auth';
@@ -53,15 +54,25 @@ const PLANS = [
   },
 ];
 
-const GRAY_RADAR = Object.values(CATEGORY_COLORS).map((c) => ({
+/*
+ * 예시 점수는 고정값이다.
+ *
+ * 예전에는 모듈 스코프에서 Math.random() 으로 만들었는데, 서버에서 그린 값과
+ * 클라이언트에서 그린 값이 달라 하이드레이션 불일치가 났다. 화면이 한 번
+ * 깜빡이고 콘솔에 경고가 쌓이지만 눈에 잘 띄지 않아 오래 남아 있었다.
+ */
+const SAMPLE_SCORES = [72, 48, 65, 54, 81];
+const CATEGORY_NAMES = ['정신력', '사회성', '업무역량', '신체/감각', '잠재력'];
+
+const GRAY_RADAR = SAMPLE_SCORES.map((score) => ({
   name: '',
-  score: 40 + Math.round(Math.random() * 30),
+  score,
   color: 'hsl(var(--muted-foreground))',
 }));
 
 const COLOR_RADAR = Object.values(CATEGORY_COLORS).map((c, i) => ({
-  name: ['정신력', '사회성', '업무역량', '신체/감각', '잠재력'][i],
-  score: GRAY_RADAR[i].score,
+  name: CATEGORY_NAMES[i],
+  score: SAMPLE_SCORES[i],
   color: `hsl(${c.hsl})`,
 }));
 
@@ -73,7 +84,6 @@ function CheckoutContent() {
   const [selectedPlan, setSelectedPlan] = useState('pro');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showOtherPlans, setShowOtherPlans] = useState(false);
 
   useEffect(() => {
     const plan = searchParams.get('plan');
@@ -130,180 +140,121 @@ function CheckoutContent() {
     <>
       <script src="https://js.tosspayments.com/v1/payment" />
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">캐릭터 시트 해금</h1>
-          <p className="text-muted-foreground">
-            숨겨진 능력치와 상세 분석을 확인하세요
+      <div className="shell max-w-[46rem] py-10 lg:py-14">
+        <header className="flex flex-col items-start gap-2">
+          <p className="eyebrow">전체 분석</p>
+          <h1 className="text-h1">잠긴 부분을 엽니다</h1>
+          <p className="max-w-[46ch] text-lead text-muted-foreground">
+            한 번 결제하면 계속 볼 수 있습니다. 구독이 아닙니다.
           </p>
-        </div>
+        </header>
 
-        {/* Before / After Comparison */}
-        <Card className="mb-8">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-2 gap-4">
-              {/* Before: grayscale */}
-              <div className="text-center">
-                <p className="text-xs font-medium text-muted-foreground mb-3 uppercase tracking-wider">무료 미리보기</p>
-                <div className="opacity-40">
-                  <RadarChart
-                    categories={GRAY_RADAR}
-                    size={140}
-                    showLabels={false}
-                    grayscale
-                    animate={false}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">일부 능력치만 공개</p>
+        {/* 무엇이 달라지는지 — 말보다 그림이 빠르다 */}
+        <section className="mt-8 rounded-card border border-border p-6 sm:p-8">
+          <div className="grid grid-cols-2 gap-6">
+            <div className="flex flex-col items-center gap-3">
+              <p className="eyebrow">지금 (무료)</p>
+              <div className="opacity-40">
+                <RadarChart categories={GRAY_RADAR} size={140} showLabels={false} grayscale animate={false} />
               </div>
-
-              {/* After: full color */}
-              <div className="text-center">
-                <p className="text-xs font-medium text-primary mb-3 uppercase tracking-wider">전체 해금</p>
-                <RadarChart
-                  categories={COLOR_RADAR}
-                  size={140}
-                  showLabels={false}
-                  animate
-                />
-                <p className="text-xs text-primary mt-2 font-medium">30개 능력치 완전 공개</p>
-              </div>
+              <p className="text-tiny text-muted-foreground">일부 능력치만</p>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Main CTA — Pro plan */}
-        <Card className="mb-6 border-primary ring-2 ring-primary/20">
-          <CardHeader className="text-center pb-3">
-            <div className="inline-flex mx-auto mb-2">
-              <span className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full">
-                추천
-              </span>
+            <div className="flex flex-col items-center gap-3">
+              <p className="eyebrow">전체 분석</p>
+              <RadarChart categories={COLOR_RADAR} size={140} showLabels={false} animate />
+              <p className="text-tiny text-muted-foreground">능력치 30개 전부</p>
             </div>
-            <CardTitle className="text-xl">{PLANS[1].name}</CardTitle>
-            <CardDescription className="text-3xl font-bold text-foreground stat-num">
-              {PLANS[1].priceLabel}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2 mb-6">
-              {PLANS[1].features.map((feature) => (
-                <li key={feature} className="text-sm flex items-start gap-2">
-                  <svg className="w-4 h-4 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {feature}
-                </li>
-              ))}
-            </ul>
+          </div>
+        </section>
 
-            {!isAuthenticated && (
-              <p className="text-sm text-muted-foreground mb-4 text-center">
-                결제하려면 먼저{' '}
-                <Link href={`/login?redirect=${encodeURIComponent('/checkout?plan=pro')}`} className="text-primary hover:underline">
-                  로그인
-                </Link>이 필요합니다
-              </p>
-            )}
+        {/* 플랜 — 전부 보여준다.
+            가격을 클릭 뒤에 숨기면 비교하려는 사람이 먼저 의심한다 */}
+        <section className="mt-10">
+          <h2 className="text-h3">플랜</h2>
 
-            {error && (
-              <p className="text-sm text-destructive mb-4 text-center">{error}</p>
-            )}
-
-            <Button
-              block
-              size="lg"
-              onClick={() => {
-                setSelectedPlan('pro');
-                handlePayment();
-              }}
-              disabled={loading}
-            >
-              {loading && selectedPlan === 'pro'
-                ? '결제 준비 중'
-                : `전체 분석 열기 · ${PLANS[1].priceLabel}`}
-            </Button>
-
-            <p className="text-xs text-muted-foreground text-center mt-3">
-              결제는 토스페이먼츠를 통해 안전하게 처리됩니다
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Other plans — collapsed */}
-        <div className="text-center mb-8">
-          <button
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 mx-auto"
-            onClick={() => setShowOtherPlans(!showOtherPlans)}
-          >
-            다른 플랜 보기
-            <svg
-              className={`w-4 h-4 transition-transform ${showOtherPlans ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-
-          {showOtherPlans && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-              {PLANS.filter((p) => p.id !== 'pro').map((p) => (
-                <Card
+          <div className="mt-5 flex flex-col gap-3">
+            {PLANS.map((p) => {
+              const selected = selectedPlan === p.id;
+              return (
+                <button
                   key={p.id}
-                  className={`cursor-pointer transition-all ${
-                    selectedPlan === p.id
-                      ? 'border-primary ring-2 ring-primary/20'
-                      : 'hover:border-primary/50'
-                  }`}
+                  type="button"
                   onClick={() => setSelectedPlan(p.id)}
+                  aria-pressed={selected}
+                  className={[
+                    'flex flex-col gap-3 rounded-card border px-6 py-5 text-left',
+                    'transition-[border-color,background-color] duration-fast ease-std',
+                    selected
+                      ? 'border-action bg-sunk'
+                      : 'border-border hover:border-border-strong',
+                  ].join(' ')}
                 >
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base flex items-center justify-between">
-                      {p.name}
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        selectedPlan === p.id ? 'border-primary' : 'border-muted-foreground/30'
-                      }`}>
-                        {selectedPlan === p.id && (
-                          <div className="w-3 h-3 rounded-full bg-primary" />
-                        )}
-                      </div>
-                    </CardTitle>
-                    <CardDescription className="text-xl font-bold text-foreground stat-num">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span
+                      className={[
+                        'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2',
+                        selected ? 'border-action' : 'border-border-strong',
+                      ].join(' ')}
+                      aria-hidden="true"
+                    >
+                      {selected ? <span className="h-2 w-2 rounded-full bg-action" /> : null}
+                    </span>
+                    <span className="text-body font-semibold">{p.name}</span>
+                    {p.recommended ? (
+                      <Badge tone="ok" size="sm">
+                        많이 선택
+                      </Badge>
+                    ) : null}
+                    <span className="stat-num ml-auto text-h4" data-numeric>
                       {p.priceLabel}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1.5">
-                      {p.features.map((feature) => (
-                        <li key={feature} className="text-xs flex items-start gap-1.5">
-                          <svg className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
+                    </span>
+                  </div>
 
-              {/* Payment button for selected non-pro plan */}
-              {selectedPlan !== 'pro' && (
-                <div className="sm:col-span-2">
-                  <Button
-                    className="w-full"
-                    size="lg"
-                    onClick={handlePayment}
-                    disabled={loading}
-                  >
-                    {loading ? '결제 준비 중...' : `${plan.priceLabel} 결제하기`}
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
+                  <ul className="flex flex-wrap gap-x-4 gap-y-1 pl-7">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex items-start gap-1.5 text-small text-muted-foreground">
+                        <span
+                          className="mt-[0.6em] h-1 w-1 shrink-0 rounded-full bg-current opacity-50"
+                          aria-hidden="true"
+                        />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {error ? (
+          <div className="mt-6">
+            <ErrorState title="결제를 준비하지 못했습니다" detail={error} />
+          </div>
+        ) : null}
+
+        <div className="mt-8 flex flex-col gap-3">
+          {!isAuthenticated ? (
+            <p className="text-small text-muted-foreground">
+              결제하려면 먼저{' '}
+              <Link
+                href={`/login?redirect=${encodeURIComponent('/checkout?plan=' + selectedPlan)}`}
+                className="font-semibold text-primary underline-offset-4 hover:underline"
+              >
+                로그인
+              </Link>
+              이 필요합니다. 결과는 그대로 유지됩니다.
+            </p>
+          ) : null}
+
+          <Button size="lg" block loading={loading} onClick={handlePayment}>
+            {plan.priceLabel} 결제하기
+          </Button>
+
+          <p className="text-center text-tiny text-muted-foreground">
+            토스페이먼츠를 통해 처리됩니다 · 카드 정보는 저장하지 않습니다
+          </p>
         </div>
       </div>
     </>
@@ -312,11 +263,7 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    }>
+    <Suspense fallback={<PageLoading label="불러오는 중" />}>
       <CheckoutContent />
     </Suspense>
   );
