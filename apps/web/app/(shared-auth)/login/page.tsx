@@ -9,8 +9,8 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field } from '@/components/ui/field';
+import { ErrorState, PageLoading } from '@/components/ui/states';
 import { useAuth } from '@/lib/auth';
 
 const loginSchema = z.object({
@@ -47,70 +47,63 @@ function LoginContent() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">
-          <Link href="/" className="text-primary hover:underline">
-            Metaphoi
-          </Link>
-        </CardTitle>
-        <CardDescription>계정에 로그인하세요</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-              {error}
-            </div>
-          )}
+    <div className="flex w-full flex-col gap-7">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="text-h2">로그인</h1>
+        <p className="text-small text-muted-foreground">
+          검사 결과를 저장하고 채용 제안을 받아보세요
+        </p>
+      </header>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">이메일</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="email@example.com"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
+      {error ? <ErrorState title="로그인하지 못했습니다" detail={error} /> : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="비밀번호 입력"
-              {...register('password')}
-            />
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
-            )}
-          </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <Field label="이메일" htmlFor="email" error={errors.email?.message} required>
+          <Input
+            id="email"
+            type="email"
+            placeholder="email@example.com"
+            autoComplete="email"
+            invalid={!!errors.email}
+            {...register('email')}
+          />
+        </Field>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? '로그인 중...' : '로그인'}
-          </Button>
-        </form>
+        <Field label="비밀번호" htmlFor="password" error={errors.password?.message} required>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            invalid={!!errors.password}
+            {...register('password')}
+          />
+        </Field>
 
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          계정이 없으신가요?{' '}
-          <Link href={redirectTo !== '/dashboard' ? `/signup?redirect=${encodeURIComponent(redirectTo)}` : '/signup'} className="text-primary hover:underline">
-            회원가입
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+        <Button type="submit" size="lg" block loading={isLoading} className="mt-2">
+          로그인
+        </Button>
+      </form>
+
+      <p className="text-center text-small text-muted-foreground">
+        계정이 없으신가요?{' '}
+        <Link
+          href={
+            redirectTo !== '/dashboard'
+              ? `/signup?redirect=${encodeURIComponent(redirectTo)}`
+              : '/signup'
+          }
+          className="font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          회원가입
+        </Link>
+      </p>
+    </div>
   );
 }
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-    }>
+    <Suspense fallback={<PageLoading label="불러오는 중" />}>
       <LoginContent />
     </Suspense>
   );

@@ -9,8 +9,8 @@ import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field } from '@/components/ui/field';
+import { ErrorState, PageLoading } from '@/components/ui/states';
 import { useAuth } from '@/lib/auth';
 
 const signupSchema = z
@@ -58,98 +58,95 @@ function SignupContent() {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">
-          <Link href="/" className="text-primary hover:underline">
-            Metaphoi
-          </Link>
-        </CardTitle>
-        <CardDescription>새 계정을 만드세요</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-              {error}
-            </div>
-          )}
+    <div className="flex w-full flex-col gap-7">
+      <header className="flex flex-col gap-1.5">
+        <h1 className="text-h2">회원가입</h1>
+        <p className="text-small text-muted-foreground">
+          검사 결과를 저장하면 언제든 다시 볼 수 있습니다
+        </p>
+      </header>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">이메일</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="email@example.com"
-              {...register('email')}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
+      {error ? <ErrorState title="가입하지 못했습니다" detail={error} /> : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="name">이름 (선택)</Label>
-            <Input
-              id="name"
-              type="text"
-              placeholder="홍길동"
-              {...register('name')}
-            />
-            {errors.name && (
-              <p className="text-sm text-destructive">{errors.name.message}</p>
-            )}
-          </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <Field label="이메일" htmlFor="email" error={errors.email?.message} required>
+          <Input
+            id="email"
+            type="email"
+            placeholder="email@example.com"
+            autoComplete="email"
+            invalid={!!errors.email}
+            {...register('email')}
+          />
+        </Field>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">비밀번호</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="비밀번호 입력"
-              {...register('password')}
-            />
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
-            )}
-          </div>
+        <Field label="이름" htmlFor="name" hint="선택 — 결과 화면에 표시됩니다" error={errors.name?.message}>
+          <Input
+            id="name"
+            type="text"
+            placeholder="어떻게 부를까요"
+            autoComplete="name"
+            invalid={!!errors.name}
+            {...register('name')}
+          />
+        </Field>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">비밀번호 확인</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="비밀번호 재입력"
-              {...register('confirmPassword')}
-            />
-            {errors.confirmPassword && (
-              <p className="text-sm text-destructive">
-                {errors.confirmPassword.message}
-              </p>
-            )}
-          </div>
+        <Field
+          label="비밀번호"
+          htmlFor="password"
+          error={errors.password?.message}
+          hint={errors.password ? undefined : '8자 이상'}
+          required
+        >
+          <Input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            invalid={!!errors.password}
+            {...register('password')}
+          />
+        </Field>
 
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? '가입 중...' : '회원가입'}
-          </Button>
-        </form>
+        <Field
+          label="비밀번호 확인"
+          htmlFor="confirmPassword"
+          error={errors.confirmPassword?.message}
+          required
+        >
+          <Input
+            id="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            invalid={!!errors.confirmPassword}
+            {...register('confirmPassword')}
+          />
+        </Field>
 
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          이미 계정이 있으신가요?{' '}
-          <Link href={redirectTo !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectTo)}` : '/login'} className="text-primary hover:underline">
-            로그인
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
+        <Button type="submit" size="lg" block loading={isLoading} className="mt-2">
+          회원가입
+        </Button>
+      </form>
+
+      <p className="text-center text-small text-muted-foreground">
+        이미 계정이 있으신가요?{' '}
+        <Link
+          href={
+            redirectTo !== '/dashboard'
+              ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+              : '/login'
+          }
+          className="font-semibold text-primary underline-offset-4 hover:underline"
+        >
+          로그인
+        </Link>
+      </p>
+    </div>
   );
 }
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-    }>
+    <Suspense fallback={<PageLoading label="불러오는 중" />}>
       <SignupContent />
     </Suspense>
   );
