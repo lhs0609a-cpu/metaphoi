@@ -2,10 +2,9 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Outcome } from '@/components/ui/outcome';
+import { PageLoading } from '@/components/ui/states';
 import { api } from '@/lib/api';
 
 function PaymentSuccessContent() {
@@ -41,76 +40,37 @@ function PaymentSuccessContent() {
   }, [searchParams]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-background to-muted flex items-center justify-center">
-      <div className="container mx-auto px-4 max-w-md">
-        <Card>
-          <CardContent className="pt-8 pb-8 text-center">
-            {status === 'loading' && (
-              <>
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4" />
-                <h2 className="text-xl font-bold mb-2">결제 확인 중...</h2>
-                <p className="text-muted-foreground">잠시만 기다려주세요</p>
-              </>
-            )}
-
-            {status === 'success' && (
-              <>
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-bold mb-2">결제 완료!</h2>
-                <p className="text-muted-foreground mb-2">
-                  종합 분석 리포트가 잠금 해제되었습니다
-                </p>
-                <p className="text-sm text-muted-foreground mb-6">
-                  전체 결과 확인 후 채용 프로필을 작성해 기업과 매칭해보세요
-                </p>
-                <div className="flex flex-col gap-3">
-                  <Link href="/results/preview">
-                    <Button className="w-full" size="lg">전체 분석 결과 보기</Button>
-                  </Link>
-                  <Link href="/dashboard">
-                    <Button variant="outline" className="w-full">대시보드로</Button>
-                  </Link>
-                </div>
-              </>
-            )}
-
-            {status === 'error' && (
-              <>
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <h2 className="text-xl font-bold mb-2">결제 실패</h2>
-                <p className="text-muted-foreground mb-6">{error}</p>
-                <div className="flex flex-col gap-3">
-                  <Link href="/checkout">
-                    <Button className="w-full">다시 시도하기</Button>
-                  </Link>
-                  <Link href="/results/preview">
-                    <Button variant="outline" className="w-full">결과 페이지로</Button>
-                  </Link>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+    <div className="shell max-w-[34rem] py-16 lg:py-24">
+      {status === 'loading' ? (
+        <PageLoading label="결제를 확인하는 중" />
+      ) : status === 'success' ? (
+        <Outcome
+          tone="ok"
+          title="결제가 완료됐습니다"
+          description="전체 분석이 열렸습니다. 결과를 보고 나면 채용 프로필을 만들어 기업 제안을 받아볼 수 있습니다."
+          actions={[
+            { label: '전체 결과 보기', href: '/results/preview' },
+            { label: '대시보드로', href: '/dashboard', variant: 'outline' },
+          ]}
+        />
+      ) : (
+        <Outcome
+          tone="danger"
+          title="결제를 확인하지 못했습니다"
+          description={error || '결제 정보가 올바르지 않습니다.'}
+          actions={[
+            { label: '다시 시도하기', href: '/checkout' },
+            { label: '결과로 돌아가기', href: '/results/preview', variant: 'outline' },
+          ]}
+        />
+      )}
+    </div>
   );
 }
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
-      </div>
-    }>
+    <Suspense fallback={<PageLoading label="불러오는 중" />}>
       <PaymentSuccessContent />
     </Suspense>
   );

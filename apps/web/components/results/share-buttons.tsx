@@ -10,6 +10,7 @@ interface ShareButtonsProps {
 }
 
 export function ShareButtons({ title, description, url }: ShareButtonsProps) {
+  const [notice, setNotice] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
 
@@ -36,7 +37,9 @@ export function ShareButtons({ title, description, url }: ShareButtonsProps) {
 
     const kakao = (window as any).Kakao;
     if (!kakao) {
-      alert('카카오톡 SDK를 로딩 중입니다. 잠시 후 다시 시도해주세요.');
+      // alert 는 브라우저를 멈춘다. 공유하려던 흐름을 끊지 않고 안내만 남긴다
+      setNotice('카카오톡 준비 중입니다. 잠시 후 다시 눌러 주세요');
+      setTimeout(() => setNotice(null), 3000);
       return;
     }
 
@@ -91,7 +94,7 @@ export function ShareButtons({ title, description, url }: ShareButtonsProps) {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <p className="text-sm font-medium text-muted-foreground">결과 공유하기</p>
+      <p className="eyebrow">결과 공유하기</p>
       <div className="flex gap-2">
         {/* 카카오톡 */}
         <Button
@@ -147,6 +150,11 @@ export function ShareButtons({ title, description, url }: ShareButtonsProps) {
           </Button>
         )}
       </div>
+      {notice ? (
+        <p role="status" className="text-tiny text-muted-foreground">
+          {notice}
+        </p>
+      ) : null}
     </div>
   );
 }
