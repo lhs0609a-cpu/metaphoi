@@ -1,5 +1,7 @@
 # Dependencies
 node_modules
+# 깨진 트리를 옆으로 치울 때 쓰는 이름. 실수로 커밋되지 않게 막는다
+node_modules.trash
 .pnpm-store
 
 # Build outputs
