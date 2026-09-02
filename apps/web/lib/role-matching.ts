@@ -9,6 +9,7 @@ import {
 } from '@/data/roles/types';
 import { INDUSTRIES, JOB_FAMILIES } from '@/data/roles/families';
 import { JOB_ROLES } from '@/data/roles/roles';
+import { onetCompetenciesFor } from '@/data/roles/onet-competencies';
 
 /**
  * 직무 매칭
@@ -57,6 +58,13 @@ export function resolveRole(role: JobRole): ResolvedRole | null {
 
   const hollandCode = role.hollandCode ?? family.hollandCode;
 
+  // O*NET 실측치가 있으면 그것을 쓰고 출처를 승격한다.
+  // 없으면 손으로 적은 provisional 값이 그대로 쓰이고, 화면에도 그렇게 표시된다.
+  const onet = onetCompetenciesFor(family.id, role.id);
+  const competencies = onet
+    ? { ...family.competencies, ...onet, ...(role.competencyOverrides ?? {}) }
+    : { ...family.competencies, ...(role.competencyOverrides ?? {}) };
+
   return {
     id: role.id,
     name: role.name,
@@ -69,9 +77,10 @@ export function resolveRole(role: JobRole): ResolvedRole | null {
     hollandCode,
     onetCode: role.onetCode ?? family.onetCode,
     riasec: riasecFromHollandCode(hollandCode),
-    competencies: { ...family.competencies, ...(role.competencyOverrides ?? {}) },
-    // 직무가 값을 덮어썼어도 근거의 질은 직군과 같다. 출처를 승격시키지 않는다.
-    competencySource: family.competencySource,
+    competencies,
+    // 손으로 덮어쓴 값이 있다고 근거가 좋아지지는 않는다.
+    // 출처는 실측치가 실제로 들어왔을 때만 올라간다.
+    competencySource: onet ? 'onet' : family.competencySource,
   };
 }
 

@@ -60,3 +60,8 @@ npm-debug.log*
 .claude/
 
 .vercel
+
+# O*NET 배포판과 그 파생물.
+# 라이선스 조건은 받는 쪽에서 확인해야 하므로 저장소에 넣지 않는다.
+apps/web/scripts/onet/data/
+apps/web/data/roles/onet-competencies.generated.ts
