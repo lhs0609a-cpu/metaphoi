@@ -76,6 +76,35 @@ export default function IntroPage() {
         </MockupStage>
       </section>
 
+      {/* 세 걸음 — 랜딩에서 가장 먼저 이해시켜야 하는 것은
+          "무엇을 하면 무엇을 받는가"다. 글로 설명하면 스크롤을 한참 내려야
+          알 수 있어서, 히어로 바로 아래에 한 줄로 놓는다 */}
+      <section className="shell pb-16 lg:pb-20">
+        <ol className="grid gap-4 sm:grid-cols-3">
+          {[
+            { n: '1', t: '문항 53개', d: '약 12분, 회원가입 없이' },
+            { n: '2', t: '능력치 30개', d: '다섯 영역으로 정리' },
+            { n: '3', t: '맞는 직군', d: '그 직군의 채용 공고까지' },
+          ].map((s, i) => (
+            <li
+              key={s.n}
+              className="flex items-baseline gap-3 rounded-card border border-border px-5 py-4"
+            >
+              <span className="stat-num shrink-0 text-small text-muted-foreground">{s.n}</span>
+              <div className="flex min-w-0 flex-col gap-0.5">
+                <span className="text-body font-semibold">{s.t}</span>
+                <span className="text-tiny text-muted-foreground">{s.d}</span>
+              </div>
+              {i < 2 ? (
+                <span className="ml-auto hidden shrink-0 text-muted-foreground sm:block" aria-hidden="true">
+                  →
+                </span>
+              ) : null}
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <div className="shell">
         <div className="rule" />
       </div>
@@ -153,7 +182,7 @@ export default function IntroPage() {
           실제 화면 — 무엇을 받는지는 말보다 화면이 빠르다
           ================================================================ */}
       <section className="shell py-16 lg:py-24">
-        <div className="grid items-center gap-12 lg:grid-cols-[1fr_20rem] lg:gap-16">
+        <div className="grid items-start gap-12 lg:grid-cols-[1fr_20rem] lg:gap-16">
           <div className="flex flex-col items-start">
             <p className="eyebrow">검사가 끝나면</p>
             <h2 className="mt-3 max-w-[18ch] text-h2">
@@ -172,7 +201,7 @@ export default function IntroPage() {
               ].map((t) => (
                 <li key={t} className="flex items-baseline gap-2.5 text-body">
                   <span
-                    className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                    className="mt-[0.55em] h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground"
                     aria-hidden="true"
                   />
                   {t}
@@ -206,15 +235,15 @@ export default function IntroPage() {
             {[
               {
                 q: '이 점수는 백분위가 아닙니다',
-                a: '규준 표본이 쌓이기 전까지는 모집단 대비 순위를 낼 수 없습니다. 지금 보이는 숫자는 당신 안에서의 상대적 크기이며, 화면에 그렇게 표시합니다.',
+                a: '규준 표본이 쌓이기 전까지는 순위를 낼 수 없습니다. 지금 숫자는 당신 안에서의 상대적 크기이고, 화면에도 그렇게 적어 둡니다.',
               },
               {
                 q: '사주와 혈액형은 보조 지표입니다',
-                a: '검증된 심리 측정과 전통 분석법은 근거의 무게가 다릅니다. 같은 비중으로 섞지 않고, 어떤 문항이 어디에 얼마나 반영됐는지 결과에서 열어 둡니다.',
+                a: '근거의 무게가 다르므로 같은 비중으로 섞지 않습니다. 채용에 쓰이는 값에서는 아예 뺍니다.',
               },
               {
                 q: '적합도만으로 사람을 거르지 마세요',
-                a: '기업 화면의 매칭 점수는 정렬을 돕는 참고 지표입니다. 가중치는 아직 준거 타당도가 검증되지 않은 설정값이라고 채용 담당자 화면에도 그대로 적어 둡니다.',
+                a: '매칭 점수는 정렬을 돕는 참고 지표입니다. 가중치가 아직 검증되지 않았다고 채용 담당자 화면에도 적어 둡니다.',
               },
             ].map((item) => (
               <div key={item.q} className="border-t border-border py-6 last:border-b">
